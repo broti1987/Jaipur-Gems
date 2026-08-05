@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaipur Gems — Book A Store Visit (Tray)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --base-black:#000000;
+    --near-black:#1C1B1F;
+    --dark-grey:#333333;
+    --white:#FFFFFF;
+    --n05:#F0F0F0;
+    --n10:#E6E6E6;
+    --n15:#D9D9D9;
+    --n20:#C5C5C5;
+    --n30:#B4B4B4;
+    --n40:#A0A0A0;
+    --n45:#8A8A8A;
+    --n50:#747474;
+    --n60:#545454;
+    --page-bg:#F4F4F4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--page-bg);color:var(--near-black);-webkit-font-smoothing:antialiased;}
+
+  /* ---------- Header ---------- */
+  header{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:80px;border-bottom:1px solid var(--n15);position:sticky;top:0;z-index:50;background:var(--page-bg);}
+  .menu-btn{display:none;align-items:center;gap:8px;background:none;border:none;font-family:inherit;font-size:14px;color:var(--near-black);cursor:pointer;padding:0;}
+  nav.main{display:flex;gap:32px;}
+  nav.main a, nav.util a{font-size:14px;color:var(--near-black);text-decoration:none;}
+  nav.util{display:flex;gap:32px;}
+  .logo{text-align:center;line-height:1;color:var(--near-black);text-decoration:none;position:absolute;left:50%;transform:translateX(-50%);}
+  .logo .l1{font-size:22px;letter-spacing:4px;font-weight:500;}
+  .logo .l2{font-size:11px;letter-spacing:8px;margin-top:3px;}
+
+  /* ---------- Demo page behind the overlay ---------- */
+  .hero{height:520px;background:var(--n10);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;padding:0 24px;}
+  .hero h1{font-size:32px;font-weight:400;}
+  .hero p{font-size:15px;color:var(--n50);max-width:420px;line-height:1.6;}
+  .ph-row{display:flex;gap:24px;padding:48px 24px;max-width:1200px;margin:0 auto;}
+  .ph{flex:1;height:280px;background:var(--n10);border-radius:8px;}
+  .btn{background:var(--base-black);color:var(--white);font-family:inherit;font-size:14px;font-weight:500;border:none;border-radius:4px;padding:15px 26px;cursor:pointer;}
+  .btn:hover{background:var(--near-black);}
+  .btn-outline{background:var(--white);color:var(--near-black);border:1px solid var(--near-black);display:inline-flex;align-items:center;gap:8px;}
+  .btn-outline:hover{background:var(--n05);}
+
+  /* ---------- Overlay + tray ---------- */
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:200;}
+  .backdrop.on{opacity:1;pointer-events:auto;}
+  .tray{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100%;background:var(--page-bg);z-index:210;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .4s cubic-bezier(.32,.72,.28,1);box-shadow:-16px 0 48px rgba(0,0,0,.12);}
+  .tray.on{transform:translateX(0);}
+  .tray-head{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid var(--n15);flex:none;background:var(--page-bg);}
+  .tray-head h2{font-size:18px;font-weight:400;}
+  .x-btn{width:36px;height:36px;border-radius:50%;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease;}
+  .x-btn:hover{background:var(--n10);}
+  .tray-body{flex:1;overflow-y:auto;padding:20px 28px 48px;}
+
+  /* ---------- Stepper ---------- */
+  .stepper{display:flex;gap:8px;background:var(--white);border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,.06);padding:6px;margin-bottom:20px;position:sticky;top:0;z-index:20;}
+  .stepper .seg{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 6px;border-radius:999px;font-size:12px;letter-spacing:.08em;color:var(--n40);cursor:pointer;user-select:none;background:transparent;border:none;font-family:inherit;}
+  .stepper .seg .dot{width:20px;height:20px;border-radius:50%;background:var(--n15);flex:none;display:none;}
+  .stepper .seg .sq{width:16px;height:16px;border-radius:4px;background:var(--n10);flex:none;}
+  .stepper .seg.active{background:var(--n05);color:var(--near-black);font-weight:500;}
+  .stepper .seg.active .sq{display:none;}
+  .stepper .seg.active .dot{display:block;}
+  .stepper .seg.done{color:var(--near-black);transition:background .15s ease;}
+  .stepper .seg.done .sq{background:var(--n30);}
+  .stepper .seg.done:hover{background:var(--n05);}
+
+  /* ---------- Card ---------- */
+  .card{background:var(--white);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.05);padding:32px 28px;}
+  .screen{display:none;}
+  .screen.on{display:block;}
+
+  /* ---------- Illustration placeholder ---------- */
+  .illus{position:relative;width:72px;height:72px;margin:0 auto 28px;animation:float 3.6s ease-in-out infinite;}
+  .illus::after{content:'';position:absolute;inset:-10px;border-radius:50%;border:1px solid var(--n20);animation:halo 3.6s ease-in-out infinite;}
+  .illus .bg{position:absolute;inset:0;border-radius:50%;background:var(--n10);animation:pulse 3.6s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+  @keyframes halo{0%,100%{transform:scale(.92);opacity:0;}50%{transform:scale(1.06);opacity:1;}}
+  .illus.morph{animation:none;}
+  .illus.morph::after{display:none;}
+  .illus.morph .bg{overflow:hidden;animation:breathe 4s ease-in-out infinite;}
+  .illus.morph .bg::after{content:'';position:absolute;top:-50%;left:-80%;width:55%;height:200%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);animation:shimmer 2.8s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+  @keyframes shimmer{0%{left:-80%;}55%,100%{left:130%;}}
+  .illus.morph.spring{animation:springIn .8s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes springIn{0%{transform:scale(0);}100%{transform:scale(1);}}
+
+  /* ---------- Fields ---------- */
+  .field{position:relative;border:1px solid var(--n60);border-radius:8px;background:var(--white);padding:8px 16px;min-height:52px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;transition:border-color .15s ease, box-shadow .15s ease;}
+  .field:hover{border-color:var(--base-black);box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .field .flabel{font-size:10px;color:var(--n45);line-height:1.4;}
+  .field .fvalue{font-size:14px;color:var(--near-black);line-height:1.4;}
+  .field .fvalue.placeholder{color:var(--n50);}
+  .field .chev{position:absolute;right:16px;top:50%;transform:translateY(-50%);transition:transform .2s;}
+  .field.open .chev{transform:translateY(-50%) rotate(180deg);}
+  .chev svg{display:block;}
+  .dropdown{border:1px solid var(--n15);border-radius:8px;background:var(--white);margin-top:8px;overflow:hidden;display:none;}
+  .dropdown.on{display:block;}
+  .dropdown .opt{padding:14px 16px;font-size:14px;cursor:pointer;}
+  .dropdown .opt:hover{background:var(--n05);}
+
+  /* ---------- Step 0 ---------- */
+  .center-col{display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .q{font-size:16px;margin-bottom:24px;}
+  #cityFieldWrap{width:100%;max-width:320px;text-align:left;}
+
+  /* ---------- Stores ---------- */
+  .result-count{text-align:center;font-size:14px;margin:22px 0 20px;}
+  .store-card{border:1px solid var(--n60);border-radius:8px;padding:20px;margin-bottom:18px;cursor:pointer;position:relative;background:var(--white);transition:border-color .15s ease, box-shadow .15s ease;}
+  .store-card:hover{border-color:var(--base-black);box-shadow:0 4px 16px rgba(0,0,0,.07);}
+  .store-card.selected{border:2px solid var(--base-black);padding:19px;}
+  .store-card h3{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;padding-right:30px;}
+  .store-row{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--n60);margin-bottom:10px;line-height:1.5;}
+  .store-row:last-child{margin-bottom:0;}
+  .store-row .ic{flex:none;width:16px;height:16px;color:var(--n60);margin-top:1px;}
+  .store-row .pair{display:flex;gap:18px;flex-wrap:wrap;}
+  .store-row .pair span{display:flex;gap:8px;align-items:center;}
+  .radio{position:absolute;top:20px;right:20px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--n40);background:var(--white);}
+  .store-card.selected .radio{border-color:var(--base-black);}
+  .store-card.selected .radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--base-black);}
+
+  .btn-row{display:flex;justify-content:center;margin-top:28px;}
+
+  /* ---------- Step 2 ---------- */
+  .stack{display:flex;flex-direction:column;gap:16px;}
+  .radio-row{display:flex;gap:36px;padding:4px 2px;}
+  .radio-opt{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;}
+  .radio-opt .r{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--n40);position:relative;flex:none;}
+  .radio-opt.sel .r{border-color:var(--base-black);}
+  .radio-opt.sel .r::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--base-black);}
+  .ffield{position:relative;}
+  .finput{width:100%;border:1px solid var(--n60);border-radius:8px;background:var(--white);min-height:52px;padding:22px 16px 8px;font-size:14px;font-family:inherit;color:var(--near-black);transition:border-color .15s ease, box-shadow .15s ease;}
+  .finput:hover{border-color:var(--base-black);box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .finput:focus{outline:none;border-color:var(--base-black);}
+  .ffield label{position:absolute;left:17px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--n50);pointer-events:none;transition:all .15s ease;}
+  .finput:focus ~ label,
+  .finput:not(:placeholder-shown) ~ label{top:9px;transform:none;font-size:10px;color:var(--n45);}
+  .phone-row{display:flex;gap:12px;}
+  .phone-row .cc{flex:none;width:100px;}
+  .phone-row .num{flex:1;}
+
+  /* ---------- Calendar ---------- */
+  .cal{padding:16px;}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-head .mon{font-size:14px;letter-spacing:.18em;}
+  .cal-head button{background:none;border:none;font-size:18px;cursor:pointer;padding:4px 10px;color:var(--near-black);font-family:inherit;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:6px;text-align:center;}
+  .cal-grid .wd{font-size:10px;letter-spacing:.08em;color:var(--n50);padding:6px 0;}
+  .cal-grid .d{font-size:13px;width:34px;height:34px;line-height:34px;margin:0 auto;border-radius:50%;cursor:pointer;}
+  .cal-grid .d:hover{background:var(--n05);}
+  .cal-grid .d.dis{color:var(--n30);pointer-events:none;}
+  .cal-grid .d.today{background:var(--n10);}
+  .cal-grid .d.sel{border:1.5px solid var(--base-black);line-height:31px;}
+
+  /* ---------- Time slots ---------- */
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;}
+  .slot{border:1px solid var(--n20);border-radius:6px;padding:12px 4px;text-align:center;font-size:13px;cursor:pointer;background:var(--white);transition:border-color .15s ease, background .15s ease;}
+  .slot:hover{background:var(--n05);border-color:var(--base-black);}
+  .slot.sel{border:1.5px solid var(--base-black);}
+
+  /* ---------- Review ---------- */
+  .review-panel{background:var(--n05);border-radius:8px;overflow:hidden;}
+  .review-row{padding:20px;position:relative;}
+  .review-row + .review-row{border-top:1px solid var(--n20);}
+  .review-row .rlabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--n60);margin-bottom:8px;}
+  .review-row .rvalue{font-size:14px;color:var(--near-black);line-height:1.5;padding-right:52px;}
+  .review-row .edit{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--near-black);background:none;border:none;cursor:pointer;font-family:inherit;}
+  .review-row .edit:hover{text-decoration:underline;}
+
+  /* ---------- Success (inside tray) ---------- */
+  #success{display:none;text-align:center;padding-top:24px;}
+  .success-h{font-size:22px;font-weight:400;margin-bottom:14px;}
+  .success-sub{font-size:14px;color:var(--n50);line-height:1.6;max-width:360px;margin:0 auto 28px;}
+  .success-card{background:var(--white);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.05);padding:32px 24px;}
+  .s-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--n60);margin-bottom:14px;}
+  .s-value{font-size:14px;line-height:1.7;color:var(--near-black);}
+  .s-div{border:none;border-top:1px solid var(--n15);max-width:260px;margin:22px auto;}
+  .sent-note{font-size:13px;color:var(--n60);margin:26px 0;}
+
+  /* ---------- Mobile: bottom tray ---------- */
+  @media (max-width:860px){
+    header{height:64px;padding:0 20px;}
+    nav.main{display:none;}
+    .menu-btn{display:flex;}
+    .hide-m{display:none;}
+    nav.util{margin-left:auto;gap:0;}
+    .logo .l1{font-size:17px;letter-spacing:3px;}
+    .logo .l2{font-size:9px;letter-spacing:6px;margin-top:2px;}
+    .hero h1{font-size:24px;}
+    .ph-row{flex-direction:column;}
+
+    .tray{top:auto;left:0;right:0;bottom:0;width:100%;height:92dvh;border-radius:20px 20px 0 0;transform:translateY(100%);box-shadow:0 -16px 48px rgba(0,0,0,.14);}
+    .tray.on{transform:translateY(0);}
+    .tray-head{padding:18px 20px;}
+    .tray-body{padding:16px 20px 40px;}
+    .stepper .seg{font-size:11px;padding:11px 4px;gap:6px;}
+    .card{padding:24px 18px;}
+    .slots{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="menu-btn" aria-label="Menu">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 4.5h14M2 9h14M2 13.5h14" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Menu
+  </button>
+  <nav class="main">
+    <a href="#">Shop All</a><a href="#">Gold</a><a href="#">Polki</a><a href="#">Diamond</a><a href="#">Gemstones</a><a href="#">Heritage</a>
+  </nav>
+  <a class="logo" href="#"><div class="l1">JAIPUR</div><div class="l2">GEMS</div></a>
+  <nav class="util">
+    <a href="#" class="hide-m">Visit Us</a><a href="#" class="hide-m">Search</a><a href="#" class="hide-m">Account</a><a href="#">Cart (0)</a>
+  </nav>
+</header>
+
+<!-- ---------- Demo page ---------- -->
+<section class="hero">
+  <h1>Visit Us</h1>
+  <p>Experience our creations in person. Book a private appointment at any of our boutiques across the UAE.</p>
+  <button class="btn" onclick="openTray()">Book A Store Visit</button>
+</section>
+<div class="ph-row"><div class="ph"></div><div class="ph"></div><div class="ph"></div></div>
+
+<!-- ---------- Overlay ---------- -->
+<div class="backdrop" id="backdrop" onclick="closeTray()"></div>
+
+<aside class="tray" id="tray" role="dialog" aria-label="Book A Store Visit">
+  <div class="tray-head">
+    <h2>Book A Store Visit</h2>
+    <button class="x-btn" onclick="closeTray()" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="#1C1B1F" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="tray-body" id="trayBody">
+
+    <div id="flow">
+      <div class="stepper" id="stepper">
+        <button class="seg active" data-go="0"><span class="dot"></span><span class="sq"></span>1. STORE</button>
+        <button class="seg" data-go="2"><span class="dot"></span><span class="sq"></span>2. DETAILS</button>
+        <button class="seg" data-go="3"><span class="dot"></span><span class="sq"></span>3. REVIEW</button>
+      </div>
+
+      <div class="card">
+
+        <!-- Step 0: city -->
+        <section class="screen on" id="s0">
+          <div class="center-col">
+            <div class="illus morph" aria-hidden="true"><span class="bg"></span></div>
+            <div class="q">Where would you like to visit us?</div>
+            <div id="cityFieldWrap">
+              <div class="field" id="cityField" onclick="toggleDrop('cityDrop','cityField')">
+                <span class="flabel" id="cityLabel" style="display:none">City</span>
+                <span class="fvalue placeholder" id="cityValue">Select City</span>
+                <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5.5L8 10.5L13 5.5" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="dropdown" id="cityDrop">
+                <div class="opt" onclick="pickCity('Dubai')">Dubai</div>
+                <div class="opt" onclick="pickCity('Abu Dhabi')">Abu Dhabi</div>
+                <div class="opt" onclick="pickCity('Sharjah')">Sharjah</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 1: store -->
+        <section class="screen" id="s1">
+          <div class="field" id="cityField2" onclick="toggleDrop('cityDrop2','cityField2')">
+            <span class="flabel">City</span>
+            <span class="fvalue" id="cityValue2">Dubai</span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5.5L8 10.5L13 5.5" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="dropdown" id="cityDrop2">
+            <div class="opt" onclick="pickCity('Dubai',true)">Dubai</div>
+            <div class="opt" onclick="pickCity('Abu Dhabi',true)">Abu Dhabi</div>
+            <div class="opt" onclick="pickCity('Sharjah',true)">Sharjah</div>
+          </div>
+          <div class="result-count" id="resultCount">2 stores in Dubai</div>
+          <div id="storeList"></div>
+          <div class="btn-row"><button class="btn" onclick="goTo(2)">Select This Store</button></div>
+        </section>
+
+        <!-- Step 2: details -->
+        <section class="screen" id="s2">
+          <div class="stack">
+            <div>
+              <div class="field" id="dateField" onclick="toggleDrop('calDrop','dateField')">
+                <span class="flabel">Appointment Date</span>
+                <span class="fvalue" id="dateValue">04/08/2026</span>
+                <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5.5L8 10.5L13 5.5" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="dropdown" id="calDrop">
+                <div class="cal">
+                  <div class="cal-head">
+                    <button aria-label="Previous month">&#8249;</button>
+                    <span class="mon">AUGUST 2026</span>
+                    <button aria-label="Next month">&#8250;</button>
+                  </div>
+                  <div class="cal-grid" id="calGrid"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="field" id="timeField" onclick="toggleDrop('timeDrop','timeField')">
+                <span class="flabel">Appointment Time</span>
+                <span class="fvalue" id="timeValue">11:30 AM</span>
+                <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5.5L8 10.5L13 5.5" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="dropdown" id="timeDrop">
+                <div class="slots" id="slotGrid"></div>
+              </div>
+            </div>
+
+            <div class="radio-row">
+              <div class="radio-opt" data-t="Mr." onclick="pickTitle(this)"><span class="r"></span>Mr.</div>
+              <div class="radio-opt sel" data-t="Ms." onclick="pickTitle(this)"><span class="r"></span>Ms.</div>
+            </div>
+
+            <div class="ffield"><input class="finput" id="fname" placeholder=" "><label for="fname">First Name *</label></div>
+            <div class="ffield"><input class="finput" id="lname" placeholder=" "><label for="lname">Last Name *</label></div>
+            <div class="ffield"><input class="finput" id="email" type="email" placeholder=" "><label for="email">Email *</label></div>
+            <div class="phone-row">
+              <div class="cc">
+                <div class="field" style="min-height:52px" onclick="void(0)">
+                  <span class="fvalue">+971</span>
+                  <span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5.5L8 10.5L13 5.5" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </div>
+              </div>
+              <div class="num"><div class="ffield"><input class="finput" id="mobile" placeholder=" "><label for="mobile">Mobile Number *</label></div></div>
+            </div>
+          </div>
+          <div class="btn-row"><button class="btn" onclick="review()">Review Your Visit</button></div>
+        </section>
+
+        <!-- Step 3: review -->
+        <section class="screen" id="s3">
+          <div class="review-panel">
+            <div class="review-row">
+              <div class="rlabel">Selected Store</div>
+              <div class="rvalue" id="rvStore">Jaipur Gems — The Dubai Mall</div>
+              <button class="edit" onclick="goTo(1)">Edit</button>
+            </div>
+            <div class="review-row">
+              <div class="rlabel">Appointment Timings</div>
+              <div class="rvalue" id="rvTime">04/08/2026, 11:30 AM</div>
+              <button class="edit" onclick="goTo(2)">Edit</button>
+            </div>
+            <div class="review-row">
+              <div class="rlabel">Personal Information</div>
+              <div class="rvalue" id="rvPerson">Ms. Aisha Khan — aisha.khan@email.com — +971 91678 4849</div>
+              <button class="edit" onclick="goTo(2)">Edit</button>
+            </div>
+          </div>
+          <div class="btn-row"><button class="btn" onclick="confirmBooking()">Confirm Booking</button></div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Success (inside tray) -->
+    <div id="success">
+      <div class="illus morph spring" id="successIllus" aria-hidden="true"><span class="bg"></span></div>
+      <h1 class="success-h">Your store visit has been booked</h1>
+      <p class="success-sub">Our Jewellery Expert will get in touch with you shortly. We look forward to seeing you</p>
+      <div class="success-card">
+        <div class="s-label">Store</div>
+        <div class="s-value" id="scStore">Jaipur Gems — The Dubai Mall<br>Unit FF-241, Fashion Avenue, The Dubai Mall<br>Downtown Dubai, Dubai, UAE</div>
+        <hr class="s-div">
+        <div class="s-label">Date &amp; Time</div>
+        <div class="s-value" id="scTime">04/08/2026<br>11:30 AM<br>In Store</div>
+        <hr class="s-div">
+        <div class="s-label">Booked By</div>
+        <div class="s-value" id="scName">Ms. Aisha Khan</div>
+      </div>
+      <p class="sent-note" id="sentNote">A confirmation has been sent to aisha.khan@email.com</p>
+      <button class="btn btn-outline" onclick="closeTray()">Continue Shopping
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H4M12 2V10" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+  </div>
+</aside>
+
+<script>
+/* ---------------- data ---------------- */
+const stores = {
+  'Dubai': [
+    { name:'Jaipur Gems — The Dubai Mall', addr:'Unit FF-241, Fashion Avenue, The Dubai Mall,<br>Downtown Dubai, Dubai, UAE', phone:'+971 4 000 0000', email:'dubai@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM, Mon – Sun' },
+    { name:'Jaipur Gems — Mall of the Emirates', addr:'Unit 114, Level 1, Mall of the Emirates<br>Al Barsha, Dubai, UAE', phone:'+971 4 222 2222', email:'dubai@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM, Mon – Sun' }
+  ],
+  'Abu Dhabi': [
+    { name:'Jaipur Gems — The Galleria', addr:'Unit 210, The Galleria, Al Maryah Island,<br>Abu Dhabi, UAE', phone:'+971 2 333 3333', email:'abudhabi@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM, Mon – Sun' }
+  ],
+  'Sharjah': [
+    { name:'Jaipur Gems — Central Souq', addr:'Shop 44, Central Souq (Blue Souq),<br>Sharjah, UAE', phone:'+971 6 444 4444', email:'sharjah@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM, Mon – Sun' }
+  ]
+};
+const state = { city:null, storeIdx:0, date:'04/08/2026', time:'11:30 AM', title:'Ms.', fname:'', lname:'', email:'', mobile:'' };
+
+/* ---------------- icons ---------------- */
+const icPin = '<svg class="ic" viewBox="0 0 18 18" fill="none"><path d="M9 16.5s5.5-4.7 5.5-9A5.5 5.5 0 0 0 3.5 7.5c0 4.3 5.5 9 5.5 9Z" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="7.5" r="1.8" stroke="currentColor" stroke-width="1.2"/></svg>';
+const icPhone = '<svg class="ic" viewBox="0 0 18 18" fill="none"><path d="M15.5 12.7v2a1.3 1.3 0 0 1-1.5 1.3 13.6 13.6 0 0 1-11.9-11.9A1.3 1.3 0 0 1 3.4 2.6h2a1.3 1.3 0 0 1 1.3 1.1c.1.8.3 1.5.6 2.2a1.3 1.3 0 0 1-.3 1.4l-.9.9a10.8 10.8 0 0 0 4.1 4.1l.9-.9a1.3 1.3 0 0 1 1.4-.3c.7.3 1.4.5 2.2.6a1.3 1.3 0 0 1 1.1 1.3Z" stroke="currentColor" stroke-width="1.1"/></svg>';
+const icMail = '<svg class="ic" viewBox="0 0 18 18" fill="none"><rect x="2" y="3.8" width="14" height="10.4" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="m2.5 4.5 6.5 5 6.5-5" stroke="currentColor" stroke-width="1.1"/></svg>';
+const icClock = '<svg class="ic" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.8" stroke="currentColor" stroke-width="1.1"/><path d="M9 5.5V9l2.4 1.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>';
+
+/* ---------------- tray ---------------- */
+function openTray(){
+  document.getElementById('backdrop').classList.add('on');
+  document.getElementById('tray').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeTray(){
+  document.getElementById('backdrop').classList.remove('on');
+  document.getElementById('tray').classList.remove('on');
+  document.body.style.overflow='';
+  /* if we just finished a booking, reset the flow for next open */
+  if(document.getElementById('success').style.display==='block'){
+    setTimeout(()=>{
+      document.getElementById('success').style.display='none';
+      document.getElementById('flow').style.display='block';
+      goTo(state.city?1:0);
+    },400);
+  }
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeTray(); });
+
+/* ---------------- navigation ---------------- */
+function goTo(step){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s'+step).classList.add('on');
+  const segs = document.querySelectorAll('.stepper .seg');
+  const stage = step<=1 ? 0 : step===2 ? 1 : 2;
+  segs.forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i===stage) s.classList.add('active');
+    else if(i<stage) s.classList.add('done');
+  });
+  closeAllDrops();
+  document.getElementById('trayBody').scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.stepper .seg').forEach(seg=>{
+  seg.addEventListener('click',()=>{
+    const target = +seg.dataset.go;
+    if(target===0) goTo(state.city?1:0);
+    else if(target===2 && state.city) goTo(2);
+    else if(target===3 && state.city) review();
+  });
+});
+
+/* ---------------- dropdown helpers ---------------- */
+function toggleDrop(dropId, fieldId){
+  const d=document.getElementById(dropId), f=document.getElementById(fieldId);
+  const wasOpen=d.classList.contains('on');
+  closeAllDrops();
+  if(!wasOpen){ d.classList.add('on'); f.classList.add('open'); }
+}
+function closeAllDrops(){
+  document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('on'));
+  document.querySelectorAll('.field').forEach(f=>f.classList.remove('open'));
+}
+
+/* ---------------- city + stores ---------------- */
+function pickCity(city, stay){
+  if(state.city!==city) state.storeIdx=0;
+  state.city=city;
+  document.getElementById('cityValue').textContent=city;
+  document.getElementById('cityValue').classList.remove('placeholder');
+  document.getElementById('cityLabel').style.display='block';
+  document.getElementById('cityValue2').textContent=city;
+  renderStores();
+  if(stay){ closeAllDrops(); }
+  else{ setTimeout(()=>goTo(1),150); }
+}
+function renderStores(){
+  const list=stores[state.city]||[];
+  if(state.storeIdx>=list.length) state.storeIdx=0;
+  document.getElementById('resultCount').textContent=list.length+' store'+(list.length>1?'s':'')+' in '+state.city;
+  const el=document.getElementById('storeList');
+  el.innerHTML='';
+  list.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='store-card'+(i===state.storeIdx?' selected':'');
+    div.innerHTML='<h3>'+s.name+'</h3>'
+      +'<div class="store-row">'+icPin+'<span>'+s.addr+'</span></div>'
+      +'<div class="store-row"><span class="pair"><span>'+icPhone+s.phone+'</span><span>'+icMail+s.email+'</span></span></div>'
+      +'<div class="store-row">'+icClock+'<span>'+s.hours+'</span></div>'
+      +'<span class="radio"></span>';
+    div.onclick=()=>{ state.storeIdx=i; renderStores(); };
+    el.appendChild(div);
+  });
+}
+
+/* ---------------- calendar ---------------- */
+const weeks=[
+  [['27',1],['28',1],['29',1],['30',1],['31',1],['1',1],['2',2]],
+  [['3',1],['4',0],['5',0],['6',0],['7',0],['8',0],['9',0]],
+  [['10',0],['11',0],['12',0],['13',0],['14',0],['15',0],['16',0]],
+  [['17',0],['18',0],['19',0],['20',0],['21',0],['22',0],['23',0]],
+  [['24',0],['25',0],['26',0],['27',0],['28',0],['29',0],['30',0]],
+  [['31',0],['1',1],['2',1],['3',1],['4',1],['5',1],['6',1]]
+];
+function buildCal(){
+  const g=document.getElementById('calGrid');
+  g.innerHTML='';
+  ['MO','TU','WE','TH','FR','SA','SU'].forEach(d=>{ g.insertAdjacentHTML('beforeend','<span class="wd">'+d+'</span>'); });
+  weeks.forEach(week=>{
+    week.forEach(([num,mode])=>{
+      const cls=['d']; if(mode===1)cls.push('dis'); if(mode===2)cls.push('today');
+      if(('0'+num).slice(-2)===state.date.slice(0,2)&&mode===0)cls.push('sel');
+      const el=document.createElement('span');
+      el.className=cls.join(' ');
+      el.textContent=num;
+      if(mode!==1){ el.onclick=()=>{ state.date=('0'+num).slice(-2)+'/08/2026'; document.getElementById('dateValue').textContent=state.date; buildCal(); closeAllDrops(); }; }
+      g.appendChild(el);
+    });
+  });
+}
+/* ---------------- time slots ---------------- */
+const times=['11:00 AM','11:30 AM','12:00 PM','3:00 PM','3:30 PM','4:00 PM','4:30 PM','5:00 PM','5:30 PM','6:00 PM'];
+function buildSlots(){
+  const g=document.getElementById('slotGrid');
+  g.innerHTML='';
+  times.forEach(t=>{
+    const el=document.createElement('div');
+    el.className='slot'+(t===state.time?' sel':'');
+    el.textContent=t;
+    el.onclick=()=>{ state.time=t; document.getElementById('timeValue').textContent=t; buildSlots(); closeAllDrops(); };
+    g.appendChild(el);
+  });
+}
+function pickTitle(el){
+  document.querySelectorAll('.radio-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  state.title=el.dataset.t;
+}
+
+/* ---------------- review + success ---------------- */
+function review(){
+  state.fname=document.getElementById('fname').value.trim()||'Aisha';
+  state.lname=document.getElementById('lname').value.trim()||'Khan';
+  state.email=document.getElementById('email').value.trim()||'aisha.khan@email.com';
+  state.mobile=document.getElementById('mobile').value.trim()||'91678 4849';
+  const store=stores[state.city||'Dubai'][state.storeIdx];
+  document.getElementById('rvStore').textContent=store.name;
+  document.getElementById('rvTime').textContent=state.date+', '+state.time;
+  document.getElementById('rvPerson').textContent=state.title+' '+state.fname+' '+state.lname+' — '+state.email+' — +971 '+state.mobile;
+  goTo(3);
+}
+function confirmBooking(){
+  const store=stores[state.city||'Dubai'][state.storeIdx];
+  document.getElementById('scStore').innerHTML=store.name+'<br>'+store.addr;
+  document.getElementById('scTime').innerHTML=state.date+'<br>'+state.time+'<br>In Store';
+  document.getElementById('scName').textContent=state.title+' '+state.fname+' '+state.lname;
+  document.getElementById('sentNote').textContent='A confirmation has been sent to '+state.email;
+  document.getElementById('flow').style.display='none';
+  const suc=document.getElementById('success');
+  suc.style.display='block';
+  /* retrigger the spring entrance */
+  const il=document.getElementById('successIllus');
+  il.classList.remove('spring'); void il.offsetWidth; il.classList.add('spring');
+  document.getElementById('trayBody').scrollTo({top:0,behavior:'smooth'});
+}
+
+/* close dropdowns on outside click */
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.field') && !e.target.closest('.dropdown')) closeAllDrops();
+});
+
+buildCal();
+buildSlots();
+</script>
+</body>
+</html>
