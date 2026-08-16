@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaipur Gems — Brand Marketing Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#000000; --near-black:#1C1B1F; --dark-grey:#333333; --white:#FFFFFF;
+    --n05:#F0F0F0; --n10:#E6E6E6; --n15:#D9D9D9; --n20:#C5C5C5; --n30:#B4B4B4;
+    --n40:#A0A0A0; --n45:#8A8A8A; --n50:#747474; --n60:#545454;
+    --header-h:80px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Inter',sans-serif;background:var(--white);color:var(--near-black);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  img{display:block;}
+
+  /* typography: no single-word last lines, no lonely words in headings */
+  h1,h2,h3,h4,.store__name,.faq__q{text-wrap:balance;}
+  p,.faq__a p,.store__row{text-wrap:pretty;}
+  /* keep short trailing phrases attached */
+  .hero p,.fold p,.craft__text p,.form__head p{hyphens:none;}
+
+  /* ---------- placeholder art ---------- */
+  .ph{background:var(--n15);position:relative;overflow:hidden;}
+  .ph svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.55;}
+  .ph--dark{background:var(--n30);}
+
+  /* ---------- HEADER (swaps on scroll) ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:60;height:var(--header-h);
+    display:flex;align-items:center;justify-content:space-between;padding:0 32px;
+    background:transparent;border-bottom:1px solid transparent;
+    transition:background .3s ease, border-color .3s ease, height .3s ease;}
+  header.scrolled{background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom-color:var(--n15);}
+  .logo{line-height:1;text-align:left;color:var(--near-black);text-decoration:none;}
+  .logo .l1{font-size:20px;letter-spacing:4px;font-weight:500;}
+  .logo .l2{font-size:10px;letter-spacing:7px;margin-top:3px;}
+  /* CTA only appears in the scrolled (overlay) header */
+  header .hdr-cta{opacity:0;transform:translateY(-4px);pointer-events:none;transition:opacity .3s ease, transform .3s ease;}
+  header.scrolled .hdr-cta{opacity:1;transform:none;pointer-events:auto;}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:13px;font-weight:500;
+    padding:12px 20px;border:1px solid var(--near-black);border-radius:4px;background:var(--white);color:var(--near-black);
+    cursor:pointer;transition:background .15s ease,color .15s ease;}
+  .btn:hover{background:var(--near-black);color:var(--white);}
+  .btn--solid{background:var(--near-black);color:var(--white);}
+  .btn--solid:hover{background:var(--black);}
+
+  /* ---------- HERO (cross-fading image pair) ---------- */
+  /* 2880×1440 desktop art — section follows the image ratio so nothing is cropped */
+  .hero{position:relative;aspect-ratio:2/1;min-height:560px;display:flex;align-items:flex-end;background:var(--n05);overflow:hidden;}
+  .hero__media{position:absolute;inset:0;}
+  .hero__media picture{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;}
+  .hero__media picture.on{opacity:1;}
+  .hero__media img{width:100%;height:100%;object-fit:cover;object-position:center;}
+  /* light scrim under the copy — sits above the images so it survives the cross-fade */
+  .hero__scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:linear-gradient(to top, rgba(240,240,240,.94) 0%, rgba(240,240,240,.66) 24%, rgba(240,240,240,0) 52%);}
+  .hero__inner{position:relative;padding:0 32px 64px;max-width:560px;}
+  .hero h1{font-size:32px;font-weight:400;line-height:1.25;margin-bottom:14px;color:var(--near-black);}
+  .hero p{font-size:15px;color:var(--n60);line-height:1.6;margin-bottom:28px;max-width:44ch;}
+
+  /* ---------- MARQUEE (infinite) ---------- */
+  .marquee{border-top:1px solid var(--n15);border-bottom:1px solid var(--n15);
+    overflow:hidden;background:var(--white);padding:26px 0;}
+  .marquee__track{display:flex;width:max-content;animation:scroll 32s linear infinite;}
+  .marquee:hover .marquee__track{animation-play-state:paused;}
+  .marquee__unit{display:flex;align-items:center;gap:40px;padding-right:40px;}
+  .marquee__unit span{font-size:14px;letter-spacing:.04em;white-space:nowrap;}
+  .marquee__unit .star{color:var(--n40);font-size:12px;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- BRAND SECTIONS (sticky image) ---------- */
+  .sections{display:grid;grid-template-columns:1fr 1fr;align-items:start;}
+  .sections__media{position:sticky;top:0;height:100vh;min-height:640px;overflow:hidden;background:var(--white);}
+  .sections__media img{width:100%;height:100%;object-fit:cover;object-position:center;
+    /* unmask reveal, left to right */
+    clip-path:inset(0 100% 0 0);transform:scale(1.06);
+    transition:clip-path 1.8s cubic-bezier(.16,1,.3,1), transform 2.2s cubic-bezier(.16,1,.3,1);}
+  .sections__media.revealed img{clip-path:inset(0 0 0 0);transform:scale(1);}
+  @media (prefers-reduced-motion:reduce){
+    .sections__media img{clip-path:none;transform:none;transition:none;}
+  }
+  .sections__copy{display:flex;flex-direction:column;}
+  .fold{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px;}
+  .tag{display:inline-flex;align-self:flex-start;background:var(--near-black);color:var(--white);
+    font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;border-radius:999px;margin-bottom:16px;}
+  .fold h2{font-size:24px;font-weight:400;line-height:1.3;margin-bottom:16px;}
+  .fold p{font-size:14px;line-height:1.65;color:var(--n60);max-width:460px;}
+  .cards{display:flex;gap:16px;margin-top:32px;flex-wrap:wrap;}
+  .card{flex:1 1 200px;background:var(--n05);border-radius:8px;padding:24px;}
+  .card h3{font-size:14px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;}
+  .card p{font-size:13px;}
+
+  /* ---------- CRAFTSMANSHIP SLIDER ---------- */
+  /* 4314×2160 desktop art ≈ 2:1 */
+  .craft{position:relative;aspect-ratio:2/1;min-height:560px;overflow:hidden;background:var(--n05);}
+  .craft__slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none;}
+  .craft__slide.on{opacity:1;pointer-events:auto;}
+  .craft__slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+  .craft__overlay{position:absolute;inset:0;
+    background:linear-gradient(to top, rgba(240,240,240,.92) 0%, rgba(240,240,240,.62) 26%, rgba(240,240,240,0) 58%);}
+  .craft__content{position:absolute;left:32px;right:32px;bottom:56px;display:flex;align-items:flex-end;justify-content:space-between;gap:40px;}
+  .craft__text{max-width:400px;opacity:0;transform:translateY(14px);transition:opacity .6s ease .1s, transform .6s ease .1s;}
+  .craft__slide.on .craft__text{opacity:1;transform:none;}
+  .craft__text h2{font-size:24px;font-weight:400;margin-bottom:12px;}
+  .craft__text p{font-size:14px;line-height:1.6;color:var(--n60);}
+  /* tabs sit above the slides so they persist */
+  .craft__tabs{position:absolute;right:32px;bottom:56px;z-index:5;display:flex;align-items:center;}
+  /* tabs rise in one after another; the connectors only appear once they have all landed */
+  .craft__tabs > .craft__tab{opacity:0;transform:translateY(16px);
+    transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);}
+  .craft__tabs.in > .craft__tab{opacity:1;transform:none;}
+  .craft__tabs > .craft__link{opacity:0;transition:opacity .4s ease;}
+  .craft__tabs.in > .craft__link{opacity:1;}
+  @media (prefers-reduced-motion:reduce){
+    .craft__tabs > .craft__tab,.craft__tabs > .craft__link{opacity:1;transform:none;transition:none;}
+  }
+  .craft__tab{background:var(--white);border:1px solid var(--n30);border-radius:4px;font-family:inherit;font-size:13px;
+    padding:12px 22px;cursor:pointer;color:var(--n50);transition:color .2s ease,border-color .2s ease,background .2s ease;white-space:nowrap;}
+  .craft__tab:hover{color:var(--near-black);border-color:var(--near-black);}
+  .craft__tab.on{background:var(--near-black);border-color:var(--near-black);color:var(--white);
+    position:relative;overflow:hidden;}
+  /* barely-there sheen, one slow pass every few seconds */
+  .craft__tab.on::after{content:'';position:absolute;top:-50%;left:-40%;width:28%;height:200%;
+    transform:rotate(18deg);pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);
+    animation:tabSheen 2.4s ease-in-out infinite;}
+  @keyframes tabSheen{0%{left:-40%;}45%,100%{left:120%;}}
+  @media (prefers-reduced-motion:reduce){ .craft__tab.on::after{animation:none;opacity:0;} }
+  /* connector doubles as a progress bar for the next slide */
+  .craft__link{width:64px;height:1px;background:var(--n30);flex:none;position:relative;overflow:hidden;}
+  .craft__link .bar{position:absolute;inset:0;background:var(--near-black);
+    transform:scaleX(0);transform-origin:left;}
+
+  /* ---------- SCROLLING IMAGE GALLERY ---------- */
+  .gallery{overflow:hidden;background:var(--white);
+    /* native swipe on touch, hidden scrollbar */
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .gallery::-webkit-scrollbar{display:none;}
+  .gallery__track{display:flex;width:max-content;will-change:transform;}
+  .gallery__item{flex:none;width:640px;aspect-ratio:1/1;background:var(--n10);overflow:hidden;}
+  .gallery__item img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* arrows, desktop only — fade in on hover */
+  .gallery{position:relative;}
+  .gallery__arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:4;
+    width:52px;height:52px;border-radius:50%;border:1px solid var(--n30);background:rgba(255,255,255,.9);
+    backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;cursor:pointer;
+    opacity:0;transition:opacity .25s ease, background .15s ease, border-color .15s ease;}
+  .gallery:hover .gallery__arrow{opacity:1;}
+  .gallery__arrow:hover{background:var(--white);border-color:var(--near-black);}
+  .gallery__arrow:focus-visible{opacity:1;outline:2px solid var(--near-black);outline-offset:2px;}
+  .gallery__arrow--prev{left:24px;}
+  .gallery__arrow--next{right:24px;}
+  .gallery__arrow svg{width:16px;height:16px;color:var(--near-black);}
+
+  /* ---------- STORES ---------- */
+  .stores{padding:96px 32px 112px;background:var(--n05);}
+  .stores h2{font-size:24px;font-weight:400;text-align:center;margin-bottom:28px;}
+  .toggle{display:flex;gap:4px;margin:0 auto 48px;padding:5px;border:1px solid var(--n15);
+    border-radius:999px;width:max-content;background:var(--white);}
+  .toggle button{display:flex;align-items:center;gap:10px;font-family:inherit;font-size:12px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--n40);background:transparent;border:none;
+    padding:14px 32px;border-radius:999px;cursor:pointer;transition:background .2s ease,color .2s ease;}
+  .toggle button .dot{width:14px;height:14px;border-radius:4px;background:var(--n10);transition:background .2s ease,border-radius .2s ease;}
+  .toggle button:hover{color:var(--near-black);}
+  .toggle button.on{background:var(--n05);color:var(--near-black);}
+  .toggle button.on .dot{background:var(--n30);border-radius:50%;}
+
+  .stores__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;max-width:1200px;margin:0 auto;}
+  .store{display:flex;border:1px solid var(--n15);overflow:hidden;background:var(--white);
+    opacity:0;transform:translateY(28px);
+    transition:opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);}
+  .store.in{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:reduce){ .store{opacity:1;transform:none;transition:none;} }
+  .store__img{flex:none;width:300px;aspect-ratio:1/1;background:var(--n15);}
+  .store__img img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* head pinned to the top, contact rows to the bottom */
+  .store__body{flex:1;padding:32px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;}
+  .store__head{display:flex;flex-direction:column;gap:12px;align-items:flex-start;}
+  .city-tag{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--n50);
+    border:1px solid var(--n45);border-radius:999px;padding:4px 8px;}
+  .store__name{font-size:12px;font-weight:500;letter-spacing:.05em;line-height:1.6;}
+  .store__rows{display:flex;flex-direction:column;gap:12px;}
+  .store__row{font-size:12px;color:var(--n60);line-height:1.45;}
+
+  /* ---------- FORM + FAQ ---------- */
+  .convert{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:100px 64px;background:var(--white);align-items:center;}
+  .convert__col{display:flex;justify-content:center;align-items:center;}
+  .convert__inner{width:450px;max-width:100%;}
+
+  .form__head{margin-bottom:32px;}
+  .form__head h2{font-size:24px;font-weight:400;margin-bottom:16px;}
+  .form__head p{font-size:14px;line-height:1.6;color:var(--n60);max-width:34ch;}
+  .form__fields{display:flex;flex-direction:column;gap:32px;}
+  .fld{position:relative;}
+  .fld input{width:100%;height:52px;border:1px solid var(--near-black);border-radius:4px;background:var(--white);
+    padding:20px 16px 6px;font-size:14px;font-family:inherit;color:var(--near-black);
+    transition:border-color .15s ease, box-shadow .15s ease;}
+  .fld input:hover{box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .fld input:focus{outline:none;box-shadow:0 0 0 1px var(--near-black);}
+  .fld label{position:absolute;left:17px;top:50%;transform:translateY(-50%);font-size:14px;
+    color:var(--n50);pointer-events:none;transition:all .15s ease;}
+  .fld input:focus ~ label,
+  .fld input:not(:placeholder-shown) ~ label{top:8px;transform:none;font-size:10px;color:var(--n45);}
+  .fld--phone{display:flex;gap:12px;}
+  .fld--phone .code{flex:none;width:110px;position:relative;}
+  .fld--phone .code select{width:100%;height:52px;border:1px solid var(--near-black);border-radius:4px;
+    background:var(--white);padding:0 16px;font-size:14px;font-family:inherit;color:var(--near-black);
+    appearance:none;cursor:pointer;}
+  .fld--phone .code svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;width:14px;height:14px;}
+  .fld--phone .num{flex:1;position:relative;}
+  .form__submit{align-self:flex-start;margin-top:0;}
+  .form__note{font-size:11px;color:var(--n50);margin-top:4px;line-height:1.6;}
+  .form__note:empty{display:none;}
+
+  .faq__item{border-bottom:1px solid var(--n15);}
+  .faq__q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:none;border:none;font-family:inherit;font-size:12px;color:var(--near-black);
+    text-align:left;padding:24px 0;cursor:pointer;line-height:1.5;}
+  .faq__q .sign{flex:none;width:16px;height:16px;position:relative;}
+  .faq__q .sign::before,.faq__q .sign::after{content:'';position:absolute;background:var(--near-black);
+    transition:transform .25s ease, opacity .25s ease;}
+  .faq__q .sign::before{left:0;top:7.5px;width:16px;height:1px;}
+  .faq__q .sign::after{top:0;left:7.5px;width:1px;height:16px;}
+  .faq__item.open .sign::after{transform:rotate(90deg);opacity:0;}
+  .faq__a{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .faq__a p{font-size:12px;line-height:1.7;color:var(--n60);padding:0 32px 24px 0;}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--n05);}
+  .foot__main{display:grid;grid-template-columns:260px 1fr 320px;gap:64px;padding:72px 80px 64px;max-width:1440px;margin:0 auto;}
+  .foot__logo{line-height:1;margin-bottom:24px;}
+  .foot__logo .l1{font-size:22px;letter-spacing:4px;font-weight:500;}
+  .foot__logo .l2{font-size:11px;letter-spacing:8px;margin-top:4px;}
+  .foot__brand p{font-size:12px;line-height:1.7;color:var(--n60);}
+  .foot__links{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .foot__col h4{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--n45);
+    font-weight:400;margin-bottom:20px;}
+  .foot__col a{display:block;font-size:12px;color:var(--near-black);text-decoration:none;margin-bottom:14px;}
+  .foot__col a:hover{text-decoration:underline;}
+  .foot__news h4{font-size:12px;font-weight:400;color:var(--near-black);margin-bottom:14px;}
+  .foot__news input{width:100%;height:44px;border:1px solid var(--n20);border-radius:4px;background:var(--white);
+    padding:0 14px;font-size:12px;font-family:inherit;margin-bottom:12px;}
+  .foot__news input::placeholder{color:var(--n40);}
+  .foot__news button{width:100%;height:44px;background:var(--n60);color:var(--white);border:none;border-radius:4px;
+    font-size:12px;font-family:inherit;cursor:pointer;transition:background .15s ease;}
+  .foot__news button:hover{background:var(--near-black);}
+  .foot__bottom{background:var(--white);border-top:1px solid var(--n15);display:flex;align-items:center;
+    justify-content:space-between;gap:24px;padding:20px 80px;flex-wrap:wrap;}
+  .foot__bottom .copy{font-size:12px;color:var(--n60);}
+  .pay{display:flex;gap:8px;flex-wrap:wrap;}
+  .pay span{font-size:10px;color:var(--n60);border:1px solid var(--n20);border-radius:3px;padding:4px 8px;background:var(--white);}
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width:860px){
+    :root{--header-h:64px;}
+    header{padding:0 20px;}
+    .logo .l1{font-size:17px;letter-spacing:3px;}
+    .logo .l2{font-size:9px;letter-spacing:6px;}
+    header .hdr-cta .btn{padding:9px 14px;font-size:12px;}
+
+    /* full viewport height, art cropped to fill */
+    .hero{aspect-ratio:auto;height:100svh;min-height:0;}
+    /* taller, denser scrim: the crop puts the figure lower, closer to the copy */
+    .hero__scrim{background:linear-gradient(to top,
+      rgba(240,240,240,.97) 0%, rgba(240,240,240,.88) 18%,
+      rgba(240,240,240,.55) 34%, rgba(240,240,240,0) 58%);}
+    .hero__inner{padding:0 24px 48px;max-width:300px;}
+    .hero h1{font-size:24px;}
+    .hero p{font-size:14px;max-width:30ch;}
+
+    .marquee{padding:20px 0;}
+    .marquee__unit span{font-size:12px;}
+    .marquee__unit{gap:28px;padding-right:28px;}
+
+    /* image stops being sticky and moves above the copy */
+    .sections{grid-template-columns:1fr;}
+    /* 2160×2160 brand art — square, so the 1:1 frame crops nothing */
+    .sections__media{position:static;height:auto;min-height:0;aspect-ratio:1/1;order:-1;}
+    .fold{min-height:0;padding:40px 24px;}
+    .fold h2{font-size:20px;}
+    .cards{flex-direction:column;}
+
+    /* full viewport height, art cropped to fill */
+    .craft{aspect-ratio:auto;height:100svh;min-height:0;}
+    .craft__content{left:24px;right:24px;bottom:104px;}
+    .craft__text{max-width:none;}
+    .craft__text h2{font-size:20px;}
+    /* snap is off while auto-scrolling (it fights programmatic scroll),
+       switched on only while the user is swiping */
+    .gallery{overflow-x:auto;scroll-snap-type:none;}
+    .gallery.snapping{scroll-snap-type:x mandatory;}
+    .gallery__item{width:100vw;scroll-snap-align:center;}
+    .gallery__arrow{display:none;}   /* swipe instead */
+
+    /* form above, FAQ below */
+    .convert{grid-template-columns:1fr;gap:56px;padding:64px 24px;}
+    .convert__inner{width:100%;}
+    .form__head h2{font-size:20px;}
+    .form__fields{gap:20px;}
+    .form__submit{width:100%;}
+    .fld--phone .code{width:104px;}
+
+    .stores{padding:56px 24px 72px;}
+    .stores h2{font-size:20px;}
+    .toggle{margin-bottom:32px;}
+    .toggle button{padding:12px 24px;font-size:11px;}
+    /* cards become a swipeable row, image stacked above the copy */
+    .stores__grid{display:flex;gap:16px;grid-template-columns:none;overflow-x:auto;
+      scroll-snap-type:x mandatory;margin:0 -24px;padding:0 24px;scrollbar-width:none;}
+    .stores__grid::-webkit-scrollbar{display:none;}
+    .store{flex:none;width:300px;flex-direction:column;scroll-snap-align:center;}
+    .store__img{width:100%;}
+    .store__body{padding:32px;}
+
+    .craft__tabs{left:24px;right:24px;bottom:32px;justify-content:stretch;}
+    .craft__tab{flex:1;padding:12px 8px;font-size:12px;text-align:center;}
+    .craft__link{width:12px;}
+
+    /* footer: centred brand + newsletter, then a two-column link grid */
+    .foot__main{grid-template-columns:1fr;gap:0;padding:56px 24px 0;}
+    .foot__brand{text-align:center;order:0;}
+    .foot__brand p{max-width:320px;margin:0 auto;}
+    .foot__news{order:1;margin:32px 0 40px;}
+    .foot__news h4{text-align:center;}
+    .foot__links{order:2;grid-template-columns:1fr 1fr;gap:8px 32px;
+      border-top:1px solid var(--n20);padding:40px 0 32px;}
+    .foot__col:nth-child(1){order:1;grid-column:1;}
+    .foot__col:nth-child(3){order:2;grid-column:2;}
+    .foot__col:nth-child(2){order:3;grid-column:1;}
+    .foot__col:nth-child(4){order:4;grid-column:2;}
+    .foot__bottom{flex-direction:column-reverse;justify-content:center;gap:16px;padding:20px 24px 28px;}
+    .pay{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER (simple → overlay on scroll) ============ -->
+<header id="hdr">
+  <a class="logo" href="#"><div class="l1">JAIPUR</div><div class="l2">GEMS</div></a>
+  <div class="hdr-cta"><button class="btn">Book A Store Visit</button></div>
+</header>
+
+<!-- ============ HERO SLIDE ============ -->
+<section class="hero">
+  <div class="hero__media" aria-hidden="true">
+    <picture class="on">
+      <source media="(max-width:860px)" srcset="assets/hero-mobile-1.webp">
+      <img src="assets/hero-desktop-1.webp" alt="">
+    </picture>
+    <picture>
+      <source media="(max-width:860px)" srcset="assets/hero-mobile-2.webp">
+      <img src="assets/hero-desktop-2.webp" alt="">
+    </picture>
+    <picture>
+      <source media="(max-width:860px)" srcset="assets/hero-mobile-3.webp">
+      <img src="assets/hero-desktop-3.webp" alt="">
+    </picture>
+    <div class="hero__scrim"></div>
+  </div>
+  <div class="hero__inner">
+    <h1>Jewellery with Quiet Elegance</h1>
+    <p>Handcrafted polki and uncut diamonds, designed in Jaipur for the moments that matter.</p>
+    <button class="btn btn--solid">Book A Store Visit</button>
+  </div>
+</section>
+
+<!-- ============ INFINITE MARQUEE ============ -->
+<div class="marquee">
+  <div class="marquee__track" id="marqueeTrack"></div>
+</div>
+
+<!-- ============ BRAND SECTIONS — sticky image, scrolling copy ============ -->
+<section class="sections">
+  <div class="sections__copy">
+    <div class="fold">
+      <span class="tag">The House of High Jewellery</span>
+      <h2>Six generations of expertise</h2>
+      <p>Jaipur Gems opened in Mumbai in 1974, but the family's understanding of gemstones runs six generations deep. That knowledge is the inheritance, the reason a piece is proportioned the way it is, and still worth wearing decades later.</p>
+    </div>
+    <div class="fold">
+      <span class="tag">Crafted for Eternity</span>
+      <h2>One atelier, start to finish</h2>
+      <p>Every piece is drawn, set, and finished by our own craftsmen. We buy no pre-set jewellery and outsource nothing. Stones are chosen before a piece is drawn, slower, and the only way we can guarantee it.</p>
+    </div>
+  </div>
+  <div class="sections__media">
+    <img src="assets/brand.webp" alt="A craftsman setting a stone by hand">
+  </div>
+</section>
+
+<!-- ============ CRAFTSMANSHIP SLIDER ============ -->
+<section class="craft" id="craft">
+  <!-- slides injected -->
+  <div class="craft__tabs" id="craftTabs"></div>
+</section>
+
+<!-- ============ SCROLLING IMAGE GALLERY ============ -->
+<section class="gallery" id="gallery" aria-label="Gallery">
+  <div class="gallery__track" id="galleryTrack"></div>
+  <button class="gallery__arrow gallery__arrow--prev" id="galPrev" aria-label="Previous image">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 2 4 8l6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="gallery__arrow gallery__arrow--next" id="galNext" aria-label="Next image">
+    <svg viewBox="0 0 16 16" fill="none"><path d="m6 2 6 6-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</section>
+
+<!-- ============ STORES ============ -->
+<section class="stores" id="stores">
+  <h2>Visit Our Stores</h2>
+  <div class="toggle" id="storeToggle" role="tablist">
+    <button class="on" data-region="india" role="tab"><span class="dot"></span>India</button>
+    <button data-region="uae" role="tab"><span class="dot"></span>UAE</button>
+  </div>
+  <div class="stores__grid" id="storesGrid"></div>
+</section>
+
+<!-- ============ FORM + FAQ ============ -->
+<section class="convert" id="convert">
+  <div class="convert__col">
+    <div class="convert__inner">
+      <div class="form__head">
+        <h2>Book A Private Viewing</h2>
+        <p>Tell us how to reach you and an advisor will take it from there, at whichever boutique suits you best.</p>
+        <!-- note: Figma still reads "whichever suits suits you best" -->
+
+      </div>
+      <form class="form__fields" id="visitForm" novalidate>
+        <div class="fld"><input id="fFull" placeholder=" " required><label for="fFull">Full Name *</label></div>
+        <div class="fld"><input id="fEmail" type="email" placeholder=" " required><label for="fEmail">Email *</label></div>
+        <div class="fld--phone">
+          <div class="code">
+            <select aria-label="Country code">
+              <option>+971</option><option>+91</option><option>+44</option><option>+1</option>
+            </select>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 5.5 8 10.5 13 5.5" stroke="#1C1B1F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="num fld"><input id="fPhone" placeholder=" " required><label for="fPhone">Mobile Number *</label></div>
+        </div>
+        <button type="submit" class="btn btn--solid form__submit">Book An Appointment</button>
+        <p class="form__note" id="formNote"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="convert__col">
+    <div class="convert__inner" id="faqList"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot__bottom">
+    <span class="copy">© 2026 Jaipur Gems</span>
+    <div class="pay">
+      <span>Visa</span><span>Mastercard</span><span>Amex</span><span>PayPal</span><span>Diners</span><span>Discover</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------------- hero: cross-fade between the two images, copy stays put ---------------- */
+const heroPics = document.querySelectorAll('.hero__media picture');
+let heroI = 0;
+setInterval(() => {
+  heroPics[heroI].classList.remove('on');
+  heroI = (heroI + 1) % heroPics.length;
+  heroPics[heroI].classList.add('on');
+}, 3000);
+
+/* ---------------- marquee: duplicate the unit so the loop is seamless ---------------- */
+const marqueeItems = ['Designed &amp; Handcrafted In-House','Since 1974','Six Generations of Expertise','Every Piece, One of a Kind'];
+function marqueeUnit(){
+  return '<div class="marquee__unit">' + marqueeItems.map(t => '<span>'+t+'</span><span class="star">&#10022;</span>').join('') + '</div>';
+}
+document.getElementById('marqueeTrack').innerHTML = marqueeUnit().repeat(6);
+
+/* ---------------- craftsmanship slider ---------------- */
+const slides = [
+  { tab:'The Art',      title:'It begins on paper',
+    body:'A piece is argued over in pencil long before any gold is cut. Proportion is settled here, and proportion is what you notice decades later.' },
+  { tab:'The Craft',    title:'The quiet of a workshop',
+    body:'A craftsman may live with a single piece for weeks. They know its weight, where it catches the light, and when it is not yet finished.' },
+  { tab:'The Material', title:'Built around the stone',
+    body:'We buy a stone before we know what it will become. Six generations have taught us to let the material lead and the design follow.' }
+];
+const craft = document.getElementById('craft');
+const tabsWrap = document.getElementById('craftTabs');
+slides.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'craft__slide' + (i === 0 ? ' on' : '');
+  el.dataset.i = i;
+  el.innerHTML =
+    '<picture>'
+    + '<source media="(max-width:860px)" srcset="assets/craft-mobile-' + (i+1) + '.webp">'
+    + '<img src="assets/craft-desktop-' + (i+1) + '.webp" alt="">'
+    + '</picture>'
+    + '<div class="craft__overlay"></div>'
+    + '<div class="craft__content"><div class="craft__text"><h2>' + s.title + '</h2><p>' + s.body + '</p></div></div>';
+  craft.insertBefore(el, tabsWrap);
+
+  if (i > 0) {
+    const link = document.createElement('span');
+    link.className = 'craft__link';
+    link.innerHTML = '<span class="bar"></span>';
+    tabsWrap.appendChild(link);
+  }
+  const btn = document.createElement('button');
+  btn.className = 'craft__tab' + (i === 0 ? ' on' : '');
+  btn.textContent = s.tab;
+  btn.dataset.i = i;
+  /* annotation: hovering a tab reveals its slide */
+  btn.addEventListener('mouseenter', () => show(i, true));
+  btn.addEventListener('focus',      () => show(i, true));
+  btn.addEventListener('click',      () => show(i, true));
+  tabsWrap.appendChild(btn);
+});
+
+let current = 0, timer = null;
+const SLIDE_MS = 5000;
+
+/* the connector after the active tab fills as the next slide approaches;
+   on the last slide both connectors drain back, cueing the loop restart */
+function paintProgress(){
+  const bars = [...document.querySelectorAll('.craft__link .bar')];
+  if (!bars.length) return;
+  bars.forEach(b => { b.style.transition = 'none'; b.style.transformOrigin = 'left'; b.style.transform = 'scaleX(0)'; });
+  void bars[0].offsetWidth;                       /* force reflow so the reset takes */
+  if (current < bars.length) {
+    const b = bars[current];
+    b.style.transition = 'transform ' + SLIDE_MS + 'ms linear';
+    b.style.transform = 'scaleX(1)';
+  } else {
+    bars.forEach(b => { b.style.transformOrigin = 'right'; b.style.transform = 'scaleX(1)'; });
+    void bars[0].offsetWidth;
+    bars.forEach(b => { b.style.transition = 'transform ' + SLIDE_MS + 'ms linear'; b.style.transform = 'scaleX(0)'; });
+  }
+}
+function show(i, userDriven){
+  current = (i + slides.length) % slides.length;
+  document.querySelectorAll('.craft__slide').forEach(el => el.classList.toggle('on', +el.dataset.i === current));
+  document.querySelectorAll('.craft__tab').forEach(el => el.classList.toggle('on', +el.dataset.i === current));
+  paintProgress();
+  if (userDriven) restart();          /* hovering resets the loop timer */
+}
+/* annotation: slides scroll infinitely */
+function restart(){ clearInterval(timer); timer = setInterval(() => show(current + 1), SLIDE_MS); }
+
+/* annotation: content fades in each time a slide comes into view —
+   pause the loop while the section is off screen so it always animates on entry */
+/* stagger the tabs in first, then bring the connectors up behind them */
+const TAB_STEP = 140;
+let tabN = 0, linkN = 0;
+const tabCount = tabsWrap.querySelectorAll('.craft__tab').length;
+[...tabsWrap.children].forEach(el => {
+  if (el.classList.contains('craft__tab')) el.style.transitionDelay = (tabN++ * TAB_STEP) + 'ms';
+  else el.style.transitionDelay = (tabCount * TAB_STEP + linkN++ * 80) + 'ms';
+});
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { show(current); restart(); tabsWrap.classList.add('in'); }
+    else { clearInterval(timer); tabsWrap.classList.remove('in'); }
+  });
+}, { threshold: 0.35 });
+io.observe(craft);
+
+/* ---------------- scrolling image gallery ----------------
+   desktop : continuous drift, pauses on hover
+   mobile  : native swipe; auto-scroll resumes ~1.2s after you stop           */
+const GALLERY_IMAGES = ['gallery-1.webp','gallery-2.webp','gallery-3.webp','gallery-4.webp','gallery-5.webp'];
+const gallery = document.getElementById('gallery');
+const gTrack  = document.getElementById('galleryTrack');
+/* duplicate the set so the loop never shows a gap */
+gTrack.innerHTML = [...GALLERY_IMAGES, ...GALLERY_IMAGES].map(src =>
+  '<div class="gallery__item"><img src="assets/' + src + '" alt="" loading="lazy"></div>'
+).join('');
+/* if an asset is missing, leave the grey block rather than a broken icon */
+gTrack.querySelectorAll('img').forEach(img => img.addEventListener('error', () => img.remove()));
+
+const isTouch = window.matchMedia('(max-width:860px)').matches || 'ontouchstart' in window;
+const SPEED = 0.45;                    /* px per frame */
+let userPaused = false;                /* hover / swipe */
+let inView = true;                     /* section on screen */
+let gResume = null;
+
+const halfWidth = () => gTrack.scrollWidth / 2;
+const running = () => inView && !userPaused;
+
+if (!isTouch) {
+  /* --- desktop: transform drift, pause on hover, arrows step one image --- */
+  let x = 0, target = null;                      /* target set while an arrow animates */
+  const wrap = v => {
+    const w = halfWidth();
+    if (v <= -w) v += w;
+    if (v > 0)   v -= w;
+    return v;
+  };
+  const step = () => {
+    if (target !== null) {
+      x += (target - x) * 0.12;                  /* ease toward the arrow target */
+      if (Math.abs(target - x) < 0.5) { x = wrap(target); target = null; }
+      gTrack.style.transform = 'translateX(' + x + 'px)';
+    } else if (running()) {
+      x = wrap(x - SPEED);
+      gTrack.style.transform = 'translateX(' + x + 'px)';
+    }
+    requestAnimationFrame(step);
+  };
+  gallery.addEventListener('mouseenter', () => userPaused = true);
+  gallery.addEventListener('mouseleave', () => userPaused = false);
+
+  const itemWidth = () => {
+    const item = gTrack.querySelector('.gallery__item');
+    return item ? item.getBoundingClientRect().width : 640;
+  };
+  const nudge = dir => { target = (target === null ? x : target) - dir * itemWidth(); };
+  document.getElementById('galNext').addEventListener('click', () => nudge(1));
+  document.getElementById('galPrev').addEventListener('click', () => nudge(-1));
+
+  requestAnimationFrame(step);
+} else {
+  /* --- mobile: real scroll so the user can swipe to any image --- */
+  let pos = 0;                                   /* keep sub-pixel precision */
+  const tick = () => {
+    if (running()) {
+      pos += SPEED * 1.6;
+      if (pos >= halfWidth()) pos -= halfWidth();  /* seamless wrap */
+      gallery.scrollLeft = pos;
+    }
+    requestAnimationFrame(tick);
+  };
+  const pause = () => {
+    userPaused = true;
+    gallery.classList.add('snapping');           /* snap only while swiping */
+    clearTimeout(gResume);
+  };
+  const resumeSoon = () => {
+    clearTimeout(gResume);
+    gResume = setTimeout(() => {
+      pos = gallery.scrollLeft;                  /* pick up from where they left it */
+      gallery.classList.remove('snapping');
+      userPaused = false;
+    }, 1200);
+  };
+  gallery.addEventListener('touchstart', pause, { passive:true });
+  gallery.addEventListener('touchmove',  pause, { passive:true });
+  gallery.addEventListener('touchend',   resumeSoon, { passive:true });
+  gallery.addEventListener('touchcancel',resumeSoon, { passive:true });
+  requestAnimationFrame(tick);
+}
+/* stop the loop while the section is off screen, restart when it returns */
+new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; }),
+  { threshold: 0 }).observe(gallery);
+
+/* ---------------- brand image: unmask reveal on entry (Madrid-style) ---------------- */
+const media = document.querySelector('.sections__media');
+new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    /* replay the wipe each time it comes back into view */
+    e.target.classList.toggle('revealed', e.isIntersecting);
+  });
+}, { threshold: 0.2 }).observe(media);
+
+/* ---------------- stores: India / UAE toggle ---------------- */
+const STORES = {
+  india: [
+    { city:'Mumbai',    name:'Jaipur Gems — Turner Road', addr:'Turner Road, Bandra West,<br>Mumbai 400050, India',
+      phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' },
+    { city:'Mumbai',    name:'Jaipur Gems — Hughes Road', addr:'Hughes Road, Girgaon,<br>Mumbai 400007, India',
+      phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' },
+    { city:'Chennai',   name:'Jaipur Gems — Chennai', addr:'Chennai, Tamil Nadu, India',
+      phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' },
+    { city:'Coimbatore',name:'Jaipur Gems — Coimbatore', addr:'Coimbatore, Tamil Nadu, India',
+      phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' }
+  ],
+  uae: [
+    { city:'Abu Dhabi', name:'Jaipur Gems — Nation Towers', addr:'Nation Towers, 1st Street, Al Bateen, W44, Abu Dhabi, UAE',
+      phone:'+971 2517 6220', email:'care@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM,<br>Mon – Sun' },
+    { city:'Dubai',     name:'Jaipur Gems — Galleria Mall', addr:'Galleria Mall, Ground Floor, F&amp;B-10, 329 Street, Al Barsha 2, Dubai, UAE',
+      phone:'+971 2517 6221', email:'care@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM,<br>Mon – Sun' }
+  ]
+};
+const storesGrid = document.getElementById('storesGrid');
+function renderStores(region){
+  storesGrid.innerHTML = STORES[region].map(s =>
+    '<article class="store">'
+    + '<div class="store__img"></div>'
+    + '<div class="store__body">'
+    +   '<div class="store__head"><span class="city-tag">' + s.city + '</span>'
+    +   '<h3 class="store__name">' + s.name + '</h3></div>'
+    +   '<div class="store__rows">'
+    +     '<div class="store__row">' + s.addr  + '</div>'
+    +     '<div class="store__row">' + s.phone + '</div>'
+    +     '<div class="store__row">' + s.email + '</div>'
+    +     '<div class="store__row">' + s.hours + '</div>'
+    +   '</div>'
+    + '</div></article>'
+  ).join('');
+  storesGrid.scrollLeft = 0;
+  revealStores();
+}
+
+/* cards rise and fade in one after another, replaying on each scroll into view */
+let storeIO = null;
+function revealStores(){
+  const cards = [...storesGrid.querySelectorAll('.store')];
+  cards.forEach((c, i) => { c.style.transitionDelay = (i * 120) + 'ms'; });
+  if (storeIO) storeIO.disconnect();
+  storeIO = new IntersectionObserver(entries => {
+    entries.forEach(e => e.target.classList.toggle('in', e.isIntersecting));
+  }, { threshold: 0.15 });
+  cards.forEach(c => storeIO.observe(c));
+}
+document.querySelectorAll('#storeToggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#storeToggle button').forEach(b => b.classList.toggle('on', b === btn));
+    renderStores(btn.dataset.region);
+  });
+});
+renderStores('india');
+
+/* ---------------- typography: bind the last two words of every block ----------------
+   text-wrap handles most cases; this stops a lone final word wherever it isn't supported */
+function bindLastWords(root){
+  root.querySelectorAll('h1, h2, h3, p, .store__row').forEach(el => {
+    if (el.children.length && !el.querySelector('br')) return;      /* skip nodes with markup */
+    el.innerHTML = el.innerHTML.replace(/\s+(\S+)\s*$/, ' $1');
+  });
+}
+
+/* ---------------- FAQ accordion ---------------- */
+const FAQS = [
+  { q:'What happens at a private viewing?',
+    a:'A private room, one family at a time, and a selection laid out for your occasion. Your advisor stays with you throughout. There is no obligation to buy.' },
+  { q:'How long will the viewing take?',
+    a:'An hour is typical. Bridal and high jewellery appointments often run longer, and we never rush a table. Tell us your occasion and we will plan the time accordingly.' },
+  { q:'Why do some pieces show price on request?',
+    a:'High jewellery and one of a kind pieces are priced by their stones, so no two are alike. Your advisor will share the price in person or over WhatsApp.' },
+  { q:'Do I need an appointment?',
+    a:'Walk-ins are always welcome at both boutiques. Booking simply means an advisor is expecting you and the pieces you want to see are ready when you arrive.' },
+  { q:'Do you take custom orders?',
+    a:'Yes. Bring a reference or an idea and our own atelier will draw it. You will receive a no obligation estimate and creative guidance before anything begins.' }
+];
+const faqList = document.getElementById('faqList');
+faqList.innerHTML = FAQS.map((f, i) =>
+  '<div class="faq__item" data-i="' + i + '">'
+  + '<button class="faq__q" aria-expanded="false">' + f.q + '<span class="sign"></span></button>'
+  + '<div class="faq__a"><p>' + f.a + '</p></div>'
+  + '</div>'
+).join('');
+faqList.querySelectorAll('.faq__item').forEach(item => {
+  const btn = item.querySelector('.faq__q');
+  const panel = item.querySelector('.faq__a');
+  btn.addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    /* one open at a time */
+    faqList.querySelectorAll('.faq__item').forEach(o => {
+      o.classList.remove('open');
+      o.querySelector('.faq__a').style.maxHeight = null;
+      o.querySelector('.faq__q').setAttribute('aria-expanded', 'false');
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+
+/* ---------------- form (prototype only) ---------------- */
+document.getElementById('visitForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name  = document.getElementById('fFull').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const note  = document.getElementById('formNote');
+  if (!name || !email || !phone) {
+    note.textContent = 'Please complete the required fields so an advisor can reach you.';
+    note.style.color = 'var(--near-black)';
+    return;
+  }
+  note.textContent = 'Thank you, ' + name.split(' ')[0] + '. An advisor will message you on WhatsApp shortly.';
+  note.style.color = 'var(--near-black)';
+  e.target.querySelector('button[type=submit]').textContent = 'Request Sent';
+});
+
+/* run last, once every section has rendered its copy */
+bindLastWords(document);
+
+/* ---------------- header swap on scroll ---------------- */
+const hdr = document.getElementById('hdr');
+const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 80);
+window.addEventListener('scroll', onScroll, { passive:true });
+onScroll();
+</script>
+</body>
+</html>
