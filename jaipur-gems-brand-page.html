@@ -192,6 +192,10 @@
   .store__name{font-size:12px;font-weight:500;letter-spacing:.05em;line-height:1.6;}
   .store__rows{display:flex;flex-direction:column;gap:12px;}
   .store__row{font-size:12px;color:var(--n60);line-height:1.45;}
+  .store__services{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:20px;}
+  .store__service{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--n60);}
+  .store__service svg{flex:none;width:14px;height:14px;}
 
   /* ---------- FORM + FAQ ---------- */
   .convert{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:100px 64px;background:var(--white);align-items:center;}
@@ -235,6 +239,20 @@
   .faq__item.open .sign::after{transform:rotate(90deg);opacity:0;}
   .faq__a{max-height:0;overflow:hidden;transition:max-height .35s ease;}
   .faq__a p{font-size:12px;line-height:1.7;color:var(--n60);padding:0 32px 24px 0;}
+
+
+  /* ---------- VIDEO BANNER ---------- */
+  .vbanner{position:relative;aspect-ratio:2/1;min-height:560px;overflow:hidden;background:var(--n05);
+    display:flex;align-items:flex-end;}
+  .vbanner video,.vbanner .vbanner__fallback{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;object-position:center;}
+  .vbanner__fallback{background:var(--n30);}
+  /* dark scrim: the footage is mid-tone, so the copy sits in white here */
+  .vbanner__scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:linear-gradient(to top, rgba(28,27,31,.62) 0%, rgba(28,27,31,.28) 26%, rgba(28,27,31,0) 58%);}
+  .vbanner__inner{position:relative;z-index:3;padding:0 32px 64px;max-width:560px;}
+  .vbanner h2{font-size:32px;font-weight:400;line-height:1.25;margin-bottom:14px;color:var(--white);}
+  .vbanner p{font-size:16px;line-height:1.6;color:rgba(255,255,255,.9);max-width:46ch;}
 
   /* ---------- FOOTER ---------- */
   footer{background:var(--n05);}
@@ -312,6 +330,12 @@
     .form__fields{gap:20px;}
     .form__submit{width:100%;}
     .fld--phone .code{width:104px;}
+
+    /* video banner matches the mobile frame's full-height crop */
+    .vbanner{aspect-ratio:auto;height:100svh;min-height:0;}
+    .vbanner__inner{padding:0 24px 48px;max-width:320px;}
+    .vbanner h2{font-size:20px;}
+    .vbanner p{font-size:12px;max-width:34ch;}
 
     .stores{padding:56px 24px 72px;}
     .stores h2{font-size:20px;}
@@ -406,6 +430,17 @@
   <div class="craft__tabs" id="craftTabs"></div>
 </section>
 
+<!-- ============ VIDEO BANNER ============ -->
+<section class="vbanner" id="vbanner">
+  <video id="bannerVideo" autoplay muted loop playsinline preload="metadata"
+         poster="assets/craft-desktop-2.webp"></video>
+  <div class="vbanner__scrim"></div>
+  <div class="vbanner__inner">
+    <h2>Jewellery with Quiet Elegance</h2>
+    <p>Handcrafted polki and uncut diamonds, designed in Jaipur for the moments that matter.</p>
+  </div>
+</section>
+
 <!-- ============ SCROLLING IMAGE GALLERY ============ -->
 <section class="gallery" id="gallery" aria-label="Gallery">
   <div class="gallery__track" id="galleryTrack"></div>
@@ -439,7 +474,9 @@
       </div>
       <form class="form__fields" id="visitForm" novalidate>
         <div class="fld"><input id="fFull" placeholder=" " required><label for="fFull">Full Name *</label></div>
+        <!-- email captured by the advisor over WhatsApp; field hidden for now
         <div class="fld"><input id="fEmail" type="email" placeholder=" " required><label for="fEmail">Email *</label></div>
+        -->
         <div class="fld--phone">
           <div class="code">
             <select aria-label="Country code">
@@ -685,22 +722,23 @@ new IntersectionObserver(entries => {
 /* ---------------- stores: India / UAE toggle ---------------- */
 const STORES = {
   india: [
-    { city:'Mumbai',    name:'Jaipur Gems — Turner Road', addr:'Turner Road, Bandra West,<br>Mumbai 400050, India',
+    { city:'Mumbai',    name:'Jaipur Gems — Turner Road', services:['Private Viewings','High Jewellery','Bespoke Commissions'], addr:'Turner Road, Bandra West,<br>Mumbai 400050, India',
       phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' },
-    { city:'Mumbai',    name:'Jaipur Gems — Hughes Road', addr:'Hughes Road, Girgaon,<br>Mumbai 400007, India',
+    { city:'Mumbai',    name:'Jaipur Gems — Hughes Road', services:['Private Viewings','Bridal Consultation','After-Sales Care'], addr:'Hughes Road, Girgaon,<br>Mumbai 400007, India',
       phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' },
-    { city:'Chennai',   name:'Jaipur Gems — Chennai', addr:'Chennai, Tamil Nadu, India',
+    { city:'Chennai',   name:'Jaipur Gems — Chennai', services:['Private Viewings','Bridal Consultation','Bespoke Commissions'], addr:'Chennai, Tamil Nadu, India',
       phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' },
-    { city:'Coimbatore',name:'Jaipur Gems — Coimbatore', addr:'Coimbatore, Tamil Nadu, India',
+    { city:'Coimbatore',name:'Jaipur Gems — Coimbatore', services:['Private Viewings','Bridal Consultation','Gemstone Expertise'], addr:'Coimbatore, Tamil Nadu, India',
       phone:'+91 81080 41000', email:'care@jaipurgems.com', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun' }
   ],
   uae: [
-    { city:'Abu Dhabi', name:'Jaipur Gems — Nation Towers', addr:'Nation Towers, 1st Street, Al Bateen, W44, Abu Dhabi, UAE',
+    { city:'Abu Dhabi', name:'Jaipur Gems — Nation Towers', services:['Private Viewings','Bridal Consultation','Virtual Appointments'], addr:'Nation Towers, 1st Street, Al Bateen, W44, Abu Dhabi, UAE',
       phone:'+971 2517 6220', email:'care@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM,<br>Mon – Sun' },
-    { city:'Dubai',     name:'Jaipur Gems — Galleria Mall', addr:'Galleria Mall, Ground Floor, F&amp;B-10, 329 Street, Al Barsha 2, Dubai, UAE',
+    { city:'Dubai',     name:'Jaipur Gems — Galleria Mall', services:['Private Viewings','Bridal Consultation','Virtual Appointments'], addr:'Galleria Mall, Ground Floor, F&amp;B-10, 329 Street, Al Barsha 2, Dubai, UAE',
       phone:'+971 2517 6221', email:'care@jaipurgems.com', hours:'Open 10:00 AM – 10:00 PM,<br>Mon – Sun' }
   ]
 };
+const TICK = '<svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.4" stroke="currentColor" stroke-width="1.1"/><path d="m5.4 8.2 1.8 1.8 3.4-3.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const storesGrid = document.getElementById('storesGrid');
 function renderStores(region){
   storesGrid.innerHTML = STORES[region].map(s =>
@@ -714,6 +752,9 @@ function renderStores(region){
     +     '<div class="store__row">' + s.phone + '</div>'
     +     '<div class="store__row">' + s.email + '</div>'
     +     '<div class="store__row">' + s.hours + '</div>'
+    +   '</div>'
+    +   '<div class="store__services">'
+    +     s.services.map(t => '<span class="store__service">' + TICK + t + '</span>').join('')
     +   '</div>'
     + '</div></article>'
   ).join('');
@@ -792,7 +833,8 @@ faqList.querySelectorAll('.faq__item').forEach(item => {
 document.getElementById('visitForm').addEventListener('submit', e => {
   e.preventDefault();
   const name  = document.getElementById('fFull').value.trim();
-  const email = document.getElementById('fEmail').value.trim();
+  const emailEl = document.getElementById('fEmail');
+  const email = emailEl ? emailEl.value.trim() : 'n/a';
   const phone = document.getElementById('fPhone').value.trim();
   const note  = document.getElementById('formNote');
   if (!name || !email || !phone) {
@@ -807,6 +849,22 @@ document.getElementById('visitForm').addEventListener('submit', e => {
 
 /* run last, once every section has rendered its copy */
 bindLastWords(document);
+
+/* ---------------- video banner: serve the crop that matches the viewport ---------------- */
+const bannerVideo = document.getElementById('bannerVideo');
+if (bannerVideo) {
+  const mq = window.matchMedia('(max-width:860px)');
+  const setSrc = () => {
+    const want = 'assets/banner-' + (mq.matches ? 'mobile' : 'desktop') + '.mp4';
+    if (!bannerVideo.src.endsWith(want)) { bannerVideo.src = want; bannerVideo.load(); }
+  };
+  setSrc();
+  mq.addEventListener('change', setSrc);
+  /* only play while on screen */
+  new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) bannerVideo.play().catch(()=>{}); else bannerVideo.pause();
+  }), { threshold: 0.15 }).observe(bannerVideo);
+}
 
 /* ---------------- header swap on scroll ---------------- */
 const hdr = document.getElementById('hdr');
