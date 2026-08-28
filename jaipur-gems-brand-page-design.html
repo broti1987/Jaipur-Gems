@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jaipur Gems — The House of High Jewellery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gotu&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   JG design tokens — from the Figma design system file
+   ============================================================ */
+:root{
+  --sand-50:#FDFBF7;  --sand-100:#FAF4EA; --sand-200:#F7EDDF; --sand-300:#F2E7DC;
+  --sand-400:#EDE1CF; --sand-500:#D6C3A8; --sand-600:#B59E7D; --sand-700:#8C7859;
+  --sand-800:#61533D;
+  --ink:#14110F; --black:#000000; --white:#FFFFFF;
+  --crimson:#850000;
+  --hair:#D9D9D9;
+
+  --display:'Gotu',serif;
+  --ui:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+
+  --gut-d:120px;   /* desktop page gutter */
+  --gut-m:24px;    /* mobile page gutter */
+  --hdr-d:80px;
+  --hdr-m:56px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+/* clip, not hidden — `overflow:hidden` here would turn the body into a scroll
+   container and break position:sticky in the brand section */
+html{-webkit-text-size-adjust:100%;overflow-x:clip;}
+body{
+  margin:0; background:var(--white); color:var(--black);
+  font-family:var(--ui); font-size:12px; line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:clip;
+}
+img,video{display:block;max-width:100%;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+
+h1,h2,h3,h4{margin:0;font-family:var(--display);font-weight:400;line-height:1.6;text-wrap:balance;}
+p{margin:0;text-wrap:pretty;}
+
+/* shared type roles */
+.eyebrow{
+  font-family:var(--ui);font-weight:600;font-size:10px;line-height:1.3;
+  letter-spacing:.10em;text-transform:uppercase;color:var(--crimson);
+}
+.btn-label{
+  font-family:var(--ui);font-weight:600;font-size:10px;line-height:1;
+  letter-spacing:.08em;text-transform:uppercase;
+}
+
+/* the small brand nugget (4px rotated square inside an 8px box) */
+.nugget{display:inline-block;width:8px;height:8px;position:relative;flex:none;}
+.nugget::after{
+  content:'';position:absolute;left:50%;top:50%;width:4px;height:4px;
+  background:var(--sand-600);transform:translate(-50%,-50%) rotate(45deg);
+}
+
+/* ============================================================
+   Header — Simple Header (logo only). Top Reverse over the hero,
+   Default (sand bar, ink logo) once the hero is behind us.
+   ============================================================ */
+.hdr{
+  position:fixed;inset:0 0 auto 0;z-index:60;height:var(--hdr-d);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:16px 48px;
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background .4s ease,border-color .4s ease,height .3s ease;
+}
+.hdr__mark{position:relative;width:73px;height:40px;flex:none;display:block;}
+.hdr__mark img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .4s ease;}
+.hdr__mark .dark{opacity:0;}
+.hdr.is-solid{background:var(--sand-400);border-bottom-color:var(--sand-500);}
+.hdr.is-solid .hdr__mark .light{opacity:0;}
+.hdr.is-solid .hdr__mark .dark{opacity:1;}
+
+/* right slot: logomark at the top of the page, solid pill once scrolled */
+.hdr__right{display:grid;align-items:center;justify-items:end;min-height:48px;}
+.hdr__right>*{grid-area:1/1;}
+.hdr__mono{width:48px;height:48px;opacity:1;transition:opacity .35s ease;}
+.hdr.is-solid .hdr__mono{opacity:0;}
+
+.hdr__cta{
+  height:44px;border-radius:999px;background:var(--black);color:var(--sand-100);
+  padding:12px 16px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;
+  opacity:0;transform:translateY(-6px);pointer-events:none;
+  transition:opacity .35s ease,transform .35s ease,background-color .3s ease;
+}
+.hdr.is-solid .hdr__cta{opacity:1;transform:none;pointer-events:auto;}
+.hdr__cta:hover{background:var(--crimson);}
+
+/* ============================================================
+   Hero — Gallery/Slide, Type = Image
+   ============================================================ */
+.hero{position:relative;height:100svh;overflow:hidden;background:var(--sand-200);}
+.hero__stage{position:absolute;inset:0;}
+.hero__slide{
+  position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;
+  background-size:cover;background-position:center;
+}
+.hero__slide.is-on{opacity:1;}
+.hero__scrim{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.25) 38%,rgba(0,0,0,0) 62%);
+}
+.hero__inner{
+  position:relative;z-index:3;height:100%;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:48px;
+}
+.hero__copy{max-width:360px;display:flex;flex-direction:column;gap:8px;}
+.hero h1{font-size:28px;color:var(--white);}
+.hero__sub{font-size:12px;line-height:1.6;color:var(--sand-600);}
+
+/* Button / Underline */
+.btn-under{
+  display:inline-flex;flex-direction:column;align-items:stretch;
+  width:max-content;min-width:128px;margin-top:8px;
+}
+.btn-under__row{display:flex;align-items:center;gap:8px;padding:14px 0;transition:gap .35s ease;}
+.btn-under__label{color:var(--white);}
+.btn-under__rule{height:1px;background:var(--sand-600);transform-origin:left;}
+/* hover: the rule wipes in again and the nugget drifts 2px further out */
+.btn-under:hover .btn-under__row{gap:10px;}
+.btn-under:hover .btn-under__rule{animation:ruleWipe .65s cubic-bezier(.76,0,.24,1);}
+@keyframes ruleWipe{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+
+/* scroll arrow — crimson fill runs top to bottom down the rule */
+.scroll-arrow{
+  position:absolute;right:32px;bottom:38px;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.scroll-arrow__track{position:relative;width:1px;height:64px;background:var(--sand-600);overflow:hidden;}
+.scroll-arrow__fill{
+  position:absolute;left:0;top:0;width:1px;height:64px;background:var(--crimson);
+  animation:arrowRun 2.4s cubic-bezier(.65,.05,.36,1) infinite;
+}
+@keyframes arrowRun{
+  0%{transform:translateY(-100%);}
+  70%,100%{transform:translateY(100%);}
+}
+
+/* ============================================================
+   Brand section — sticky media right, two folds left
+   ============================================================ */
+.brand{position:relative;background:var(--white);display:grid;grid-template-columns:1fr 1fr;}
+.brand__cols{grid-column:1;grid-row:1;}
+.brand__media{grid-column:2;grid-row:1;position:sticky;top:0;height:100vh;align-self:start;}
+/* the media fills its half edge to edge — no letterboxing */
+.brand__frame{
+  position:relative;width:100%;height:100%;
+  background:var(--white);overflow:hidden;
+  transition:clip-path .85s cubic-bezier(.62,.05,.2,1);
+}
+/* the unmask only arms once JS is running, so the image is never stuck hidden */
+.brand__frame.armed{clip-path:inset(0 100% 0 0);}
+.brand__frame.armed.is-open{clip-path:inset(0 0 0 0);}
+.brand__frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease;}
+.brand__frame img.is-on{opacity:1;}
+
+.brand__fold{height:720px;display:flex;align-items:center;padding:120px;}
+.brand__fold--2{border-top:1px solid var(--hair);}
+.brand__spacer{height:500px;}
+.brand__body{max-width:400px;display:flex;flex-direction:column;gap:12px;}
+.brand__head{display:flex;flex-direction:column;gap:16px;}
+.brand h2{font-size:24px;color:var(--black);}
+.brand p{font-size:12px;line-height:1.6;color:var(--black);}
+
+/* ============================================================
+   USP section
+   ============================================================ */
+.usp{
+  border-top:1px solid var(--sand-300);
+  background:var(--sand-50) url('assets/usp-bg-desktop.webp') center/cover no-repeat;
+  padding:100px var(--gut-d);
+  display:flex;flex-direction:column;align-items:center;gap:32px;
+}
+.usp h2{font-size:24px;color:var(--black);}
+.usp__row{display:flex;gap:48px;justify-content:center;width:100%;max-width:100%;}
+.usp__card{
+  width:200px;flex:none;background:var(--sand-50);border:1px solid var(--sand-500);
+  border-radius:16px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:6px 6px 32px rgba(181,158,125,.30);          /* Figma: Sand/600 @ 30%, 6/6, blur 32 */
+  opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1);
+}
+.usp__card.in{opacity:1;transform:none;}
+.usp__ico{height:200px;display:flex;align-items:center;justify-content:center;}
+.usp__disc{
+  width:100px;height:100px;border-radius:999px;background:var(--sand-100);
+  border:1px solid var(--sand-500);display:flex;align-items:center;justify-content:center;
+}
+.usp__disc svg,.usp__disc img{width:48px;height:48px;display:block;}
+.usp__txt{
+  border-top:1px solid var(--sand-400);padding:24px;min-height:100px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--display);font-size:14px;line-height:1.6;color:var(--sand-800);
+}
+
+/* ============================================================
+   Craftsmanship slider
+   ============================================================ */
+.craft{position:relative;height:100svh;overflow:hidden;background:var(--ink);}
+.craft__slide{
+  position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none;
+  background-size:cover;background-position:center;
+}
+.craft__slide.is-on{opacity:1;}
+.craft__slide::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.15) 45%,rgba(0,0,0,0) 75%);
+}
+.craft__copy{
+  position:absolute;left:48px;bottom:48px;z-index:3;max-width:400px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.craft__copy h3{font-size:28px;color:var(--white);opacity:0;transform:translateY(14px);
+  transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1);}
+.craft__copy p{font-size:12px;color:var(--white);opacity:0;transform:translateY(14px);
+  transition:opacity .7s ease .08s,transform .7s cubic-bezier(.22,1,.36,1) .08s;}
+.craft__copy.is-on h3,.craft__copy.is-on p{opacity:1;transform:none;}
+
+.craft__tabs{position:absolute;right:48px;bottom:48px;z-index:4;display:flex;align-items:center;}
+.craft__link{width:64px;height:1px;background:rgba(255,255,255,.55);flex:none;}
+.craft__tab{
+  position:relative;width:120px;height:44px;border-radius:999px;overflow:hidden;
+  border:1px solid var(--white);color:var(--white);
+  display:flex;align-items:center;justify-content:center;flex:none;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1),color .35s ease,background-color .35s ease;
+}
+.craft__tabs.in .craft__tab{opacity:1;transform:none;}
+.craft__tab .lbl{position:relative;z-index:3;}
+.craft__tab .fill{
+  position:absolute;inset:0;background:var(--white);transform:scaleX(0);transform-origin:left;z-index:1;
+}
+.craft__tab.on{background:rgba(255,255,255,.5);color:var(--black);}
+/* hover fills solid white straight away — no progress bar, no glint */
+.craft__tab:hover{background:var(--white);border-color:var(--white);color:var(--black);}
+.craft__tab:hover .fill{opacity:0;}
+
+/* ============================================================
+   Video banner — Gallery/Slide, Type = Video
+   ============================================================ */
+.banner{position:relative;height:100svh;overflow:hidden;background:var(--ink);}
+.banner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.banner__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.85) 100%);}
+.banner__copy{
+  position:absolute;left:48px;bottom:48px;z-index:3;max-width:430px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.banner__copy h2{font-size:28px;color:var(--white);}
+.banner__copy p{font-size:12px;color:var(--white);}
+
+/* ============================================================
+   Scrolling image gallery
+   ============================================================ */
+.marquee{position:relative;height:640px;overflow:hidden;background:var(--sand-100);}
+.marquee__track{display:flex;height:100%;width:max-content;will-change:transform;}
+.marquee__item{width:640px;height:640px;flex:none;background-size:cover;background-position:center;background-color:var(--sand-300);}
+/* Madrid-style edge zones: the native pointer is hidden and replaced by a
+   trailing underlined "Previous" / "Next" label that follows the cursor */
+.marquee__zone{
+  position:absolute;top:0;bottom:0;width:200px;z-index:5;
+  background:none;border:0;padding:0;cursor:none;
+}
+.marquee__zone[data-type="prev"]{left:0;}
+.marquee__zone[data-type="next"]{right:0;}
+.gcursor{
+  position:fixed;left:0;top:0;height:20px;z-index:80;pointer-events:none;
+  display:grid;place-items:center;opacity:0;transition:opacity .4s ease;
+}
+.gcursor:not([data-type=""]){opacity:1;}
+.gcursor__label{
+  color:var(--sand-100);white-space:nowrap;
+  text-decoration:underline;text-underline-offset:3px;
+  text-shadow:0 1px 12px rgba(0,0,0,.45);
+}
+
+/* ============================================================
+   Stores
+   ============================================================ */
+.stores{background:var(--sand-50);padding:100px 32px;display:flex;flex-direction:column;align-items:center;gap:32px;}
+.stores__head{display:flex;flex-direction:column;align-items:center;gap:32px;}
+.stores h2{font-size:24px;color:var(--ink);}
+
+.toggle{
+  position:relative;display:flex;padding:8px;gap:0;
+  background:var(--sand-200);border:1px solid var(--sand-500);border-radius:999px;
+}
+.toggle__pill{
+  position:absolute;top:8px;left:8px;height:calc(100% - 16px);border-radius:999px;
+  background:var(--sand-50);transition:transform .4s cubic-bezier(.22,1,.36,1),width .4s ease;z-index:1;
+}
+.toggle button{
+  position:relative;z-index:2;min-width:140px;height:46px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;
+  font-family:var(--ui);font-weight:600;font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--black);transition:color .3s ease;
+}
+.toggle button:not(.on):hover{color:var(--crimson);}
+.toggle .flag{width:22px;height:22px;border-radius:999px;overflow:hidden;border:1px solid var(--sand-500);flex:none;}
+.toggle .flag svg{width:100%;height:100%;display:block;}
+
+.stores__grid{
+  width:100%;max-width:1200px;
+  display:grid;grid-template-columns:1fr 1fr;gap:32px 32px;
+}
+.store{
+  display:flex;background:var(--sand-50);border:1px solid var(--sand-500);
+  border-radius:16px;overflow:hidden;min-height:300px;
+  opacity:0;transform:translateY(28px);
+  transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1),border-color .3s ease,box-shadow .3s ease;
+}
+.store.in{opacity:1;transform:none;}
+.store:hover{border-color:var(--sand-600);box-shadow:0 12px 32px -22px rgba(20,17,15,.5);}
+.store__img{width:300px;flex:none;background:var(--sand-300) center/cover no-repeat;}
+.store__body{flex:1;display:flex;flex-direction:column;justify-content:space-between;}
+.store__pad{padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:16px;flex:1;}
+.store__head{display:flex;flex-wrap:wrap;gap:8px;
+  font-family:var(--ui);font-weight:600;font-size:12px;line-height:1.3;
+  letter-spacing:.10em;text-transform:uppercase;}
+.store__city{color:var(--crimson);}
+.store__name{color:var(--black);}
+.store__rows{display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.6;color:var(--sand-800);}
+.store__hours .d{color:var(--sand-600);}
+.store__svc{background:var(--sand-100);padding:24px;display:flex;flex-wrap:wrap;gap:4px;}
+/* the 16px nugget box sets the row height, so wrapped rows sit 20px apart (Figma) */
+.store__tag{
+  display:inline-flex;align-items:center;gap:0;min-height:16px;
+  font-family:var(--ui);font-weight:600;font-size:8px;line-height:1;
+  letter-spacing:.10em;text-transform:uppercase;color:var(--sand-700);
+}
+.store__tag .nugget{width:16px;height:16px;}
+
+/* ============================================================
+   Form + FAQ
+   ============================================================ */
+.convert{background:var(--sand-100);padding:100px 64px;}
+.convert__wrap{
+  max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;
+}
+.form{max-width:450px;display:flex;flex-direction:column;gap:32px;}
+.form__head{display:flex;flex-direction:column;gap:16px;}
+.form__head h2{font-size:24px;color:var(--ink);}
+.form__head p{font-size:12px;color:var(--sand-800);}
+/* Input/Input Field — Default: label centred at 10px. Active: the label shrinks
+   to 8px and rises to the top of a 2px-gap stack, value sits below in Ink.
+   Border and radius are unchanged between states, per the component. */
+.field{position:relative;}
+.field input{
+  width:100%;height:52px;border-radius:999px;border:1px solid var(--sand-700);
+  background:transparent;padding:26px 24px 12px;
+  font-family:var(--ui);font-size:10px;line-height:14px;color:var(--black);
+  transition:border-color .25s ease;
+}
+.field input::placeholder{color:transparent;}
+.field label{
+  position:absolute;left:24px;top:50%;transform:translateY(-50%);
+  font-size:10px;line-height:14px;color:var(--sand-700);pointer-events:none;
+  transition:transform .22s ease,font-size .22s ease;
+}
+.field input:focus{outline:none;}
+.field input:focus+label,.field input:not(:placeholder-shown)+label{
+  font-size:8px;line-height:11px;transform:translateY(calc(-50% - 8px));
+}
+.field:hover input{border-color:var(--sand-800);}
+.phone{display:flex;gap:12px;}
+.phone__code{
+  width:105px;flex:none;height:52px;border-radius:999px;border:1px solid var(--sand-700);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+  font-size:10px;color:var(--sand-700);
+}
+.phone__code svg{width:12px;height:12px;flex:none;}
+.phone .field{flex:1;}
+
+.btn-solid{
+  align-self:flex-start;height:44px;border-radius:999px;background:var(--black);color:var(--sand-100);
+  padding:12px 24px;display:inline-flex;align-items:center;justify-content:center;
+  transition:background-color .3s ease,transform .3s ease;
+}
+.btn-solid:hover{background:var(--crimson);}
+.btn-solid:active{transform:translateY(1px);}
+
+.faqs{display:flex;flex-direction:column;justify-self:end;width:100%;max-width:450px;}
+.faq{border-bottom:1px dashed var(--sand-500);}
+.faq__q{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:24px 0;text-align:left;font-family:var(--display);font-size:14px;line-height:1.6;color:var(--ink);
+  transition:color .25s ease;
+}
+.faq__q:hover{color:var(--crimson);}
+.faq__sign{position:relative;width:16px;height:16px;flex:none;}
+.faq__sign::before,.faq__sign::after{content:'';position:absolute;background:var(--ink);transition:transform .3s ease,opacity .3s ease;}
+.faq__sign::before{left:0;top:7.5px;width:16px;height:1px;}
+.faq__sign::after{top:0;left:7.5px;width:1px;height:16px;}
+.faq.open .faq__sign::after{transform:scaleY(0);opacity:0;}
+.faq__a{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.faq__a p{font-size:12px;line-height:1.7;color:var(--sand-800);padding:0 32px 24px 0;}
+
+/* ============================================================
+   Footer — bottom bar only
+   ============================================================ */
+.foot{background:var(--black);padding:20px var(--gut-d);display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.foot__c{font-size:10px;line-height:1.7;color:var(--sand-600);}
+.foot__pay{display:flex;gap:6px;flex-wrap:wrap;}
+.foot__pay span{
+  font-size:10px;line-height:1.7;color:var(--sand-600);
+  padding:5px 8px;border-radius:4px;border:1px solid rgba(181,158,125,.28);
+}
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+@media (max-width:767px){
+  .hdr{height:var(--hdr-m);padding:12px var(--gut-m);}
+  .hdr.is-solid{height:60px;}
+  .hdr__mark{width:54px;height:32px;}
+  .hdr__right{min-height:32px;}
+  .hdr__mono{width:32px;height:32px;}
+  .hdr__cta{height:36px;padding:10px 14px;font-size:9px;}
+
+  .hero__slide{background-position:50% 22%;}
+  .hero__scrim{background:linear-gradient(0deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,.35) 26%,rgba(0,0,0,0) 52%);}
+  .hero__inner{padding:24px;}
+  .hero__copy{max-width:240px;}
+  .hero h1{font-size:20px;}
+  .hero__sub{font-size:10px;}
+  .btn-under{min-width:0;}
+  /* the hint sits mid-height on the right, clear of the copy block */
+  .scroll-arrow{right:24px;bottom:auto;top:50%;transform:translateY(-50%);}
+
+  .brand{display:block;}
+  .brand__media{position:static;height:auto;}
+  .brand__frame{width:100%;height:auto;aspect-ratio:1;}
+  .brand__fold{height:auto;padding:48px 24px 24px;}
+  .brand__fold--2{padding:24px 24px 48px;border-top:0;}
+  .brand__body{max-width:none;gap:12px;}
+  .brand h2{font-size:16px;}
+  .brand__spacer{display:none;}
+
+  .usp{padding:48px 0;gap:24px;background-image:url('assets/usp-bg-mobile.webp');}
+  .usp h2{font-size:20px;}
+  /* vertical padding gives the drop shadow room inside the scroll box, and the
+     negative margins cancel it so the section rhythm is unchanged — then y can
+     be clipped safely and there is nothing left to scroll vertically */
+  .usp__row{
+    justify-content:flex-start;gap:16px;
+    padding:28px 24px 40px;margin:-28px 0 -40px;
+    overflow-x:auto;overflow-y:hidden;
+    touch-action:pan-x;overscroll-behavior-x:contain;
+    scrollbar-width:none;
+  }
+  .usp__row::-webkit-scrollbar{display:none;}
+  /* fade only, so the 28px rise cannot extend the scroll box either */
+  .usp__card{border-radius:24px;transform:none;transition:opacity .7s ease;}
+  .usp__card.in{transform:none;}
+
+  .craft__copy{left:24px;right:24px;bottom:104px;max-width:none;}
+  .craft__copy h3{font-size:20px;}
+  .craft__tabs{left:24px;right:24px;bottom:24px;justify-content:space-between;}
+  .craft__tab{width:auto;flex:1;height:36px;}
+  .craft__link{flex:0 0 14px;width:14px;}
+
+  .banner__copy{left:24px;right:24px;bottom:24px;max-width:none;}
+  .banner__copy h2{font-size:20px;}
+  .banner__copy p{font-size:10px;}
+
+  .marquee{height:390px;}
+  .marquee__item{width:390px;height:390px;}
+  .marquee__zone,.gcursor{display:none;}
+
+  .stores{padding:48px 0;gap:24px;}
+  .stores h2{font-size:20px;}
+  .stores__head{gap:24px;padding:0 32px;width:100%;}
+  .toggle{width:100%;padding:4px;}
+  .toggle button{flex:1;min-width:0;height:44px;gap:12px;}
+  .stores__grid{
+    display:flex;gap:16px;padding:0 32px;align-items:flex-start;
+    overflow-x:auto;overflow-y:hidden;
+    touch-action:pan-x;                 /* vertical drags go to the page, not the strip */
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+  }
+  .stores__grid::-webkit-scrollbar{display:none;}
+  /* fade only — the 28px rise created bottom overflow inside a scrolling strip,
+     which is what the strip was scrolling vertically to reach */
+  .store{
+    flex:0 0 300px;flex-direction:column;border-radius:8px;min-height:0;
+    transform:none;transition:opacity .7s ease,border-color .3s ease,box-shadow .3s ease;
+  }
+  .store.in{transform:none;}
+  .store__img{width:100%;height:300px;}
+  .store__pad{padding:24px;gap:24px;}
+  .store__svc{padding:20px;}
+
+  .convert{padding:48px 0;}
+  .convert__wrap{display:flex;flex-direction:column;gap:48px;max-width:none;}
+  .form{max-width:none;padding:0 24px;gap:20px;}
+  .form__head h2{font-size:20px;}
+  .btn-solid{align-self:stretch;padding:12px 16px;}
+  .faqs{padding:0 24px;max-width:none;}
+
+  .foot{padding:32px 24px;justify-content:center;text-align:center;}
+  .foot__c{font-size:8px;color:var(--sand-400);}
+  .foot__pay{display:none;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  .brand__frame{clip-path:none !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="hdr" id="hdr">
+  <a class="hdr__mark" href="#" aria-label="Jaipur Gems">
+    <img class="light" src="assets/logo-light.svg" alt="Jaipur Gems">
+    <img class="dark"  src="assets/logo-dark.svg"  alt="" aria-hidden="true">
+  </a>
+  <div class="hdr__right">
+    <img class="hdr__mono" src="assets/logomark.svg" alt="" aria-hidden="true">
+    <a class="hdr__cta btn-label" href="#book">Book A Store Visit</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero">
+  <div class="hero__stage" id="heroStage">
+    <div class="hero__slide is-on" data-d="assets/hero-brand-desktop.webp" data-m="assets/hero-brand-mobile.webp"></div>
+  </div>
+  <div class="hero__scrim"></div>
+
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <h1>Jewellery with Quiet Elegance</h1>
+      <p class="hero__sub">Handcrafted polki and uncut diamonds, designed in Jaipur for the moments that matter.</p>
+      <a class="btn-under" href="#book">
+        <span class="btn-under__row"><span class="btn-label btn-under__label">Book a store visit</span><span class="nugget"></span></span>
+        <span class="btn-under__rule"></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="scroll-arrow">
+    <span class="scroll-arrow__track"><span class="scroll-arrow__fill"></span></span>
+    <span class="nugget"></span>
+  </div>
+</section>
+
+<!-- ================= BRAND ================= -->
+<section class="brand" id="brand">
+  <div class="brand__media">
+    <div class="brand__frame" id="brandFrame">
+      <img class="is-on" id="brandImg1" src="assets/brand-1.webp" alt="">
+      <img id="brandImg2" src="assets/brand-2.webp" alt="">
+    </div>
+  </div>
+
+  <div class="brand__cols">
+    <div class="brand__fold" data-img="0">
+      <div class="brand__body">
+        <div class="brand__head">
+          <span class="eyebrow">The House of High Jewellery</span>
+          <h2>Six generations of expertise</h2>
+        </div>
+        <p>Jaipur Gems opened in Mumbai in 1974, but the family&rsquo;s understanding of gemstones runs six generations deep. That knowledge is the inheritance, the reason a piece is proportioned the way it is, and still worth wearing decades later.</p>
+      </div>
+    </div>
+
+    <div class="brand__fold brand__fold--2" data-img="1">
+      <div class="brand__body">
+        <div class="brand__head">
+          <span class="eyebrow">Crafted for Eternity</span>
+          <h2>One atelier, start to finish</h2>
+        </div>
+        <p>Every piece is drawn, set, and finished by our own craftsmen. We buy no pre-set jewellery and outsource nothing. Stones are chosen before a piece is drawn, slower, and the only way we can guarantee it.</p>
+      </div>
+    </div>
+
+    <div class="brand__spacer"></div>
+  </div>
+</section>
+
+<!-- ================= USP ================= -->
+<section class="usp" id="usp">
+  <h2>What Sets Us Apart</h2>
+  <div class="usp__row" id="uspRow"></div>
+</section>
+
+<!-- ================= CRAFTSMANSHIP ================= -->
+<section class="craft" id="craft">
+  <div class="craft__slide is-on" data-d="assets/craft-desktop-1.webp" data-m="assets/craft-mobile-1.webp"></div>
+  <div class="craft__slide"       data-d="assets/craft-desktop-2.webp" data-m="assets/craft-mobile-2.webp"></div>
+  <div class="craft__slide"       data-d="assets/craft-desktop-3.webp" data-m="assets/craft-mobile-3.webp"></div>
+
+  <div class="craft__copy" id="craftCopy">
+    <h3 id="craftTitle">It begins on paper</h3>
+    <p id="craftBody">A piece is argued over in pencil long before any gold is cut. Proportion is settled here, and proportion is what you notice decades later.</p>
+  </div>
+
+  <div class="craft__tabs" id="craftTabs"></div>
+</section>
+
+<!-- ================= VIDEO BANNER ================= -->
+<section class="banner" id="banner">
+  <video id="bannerVideo" muted playsinline loop preload="metadata"></video>
+  <div class="banner__scrim"></div>
+  <div class="banner__copy">
+    <h2>Jewellery with Quiet Elegance</h2>
+    <p>Handcrafted polki and uncut diamonds, designed in Jaipur<br>for the moments that matter.</p>
+  </div>
+</section>
+
+<!-- ================= SCROLLING GALLERY ================= -->
+<section class="marquee" id="marquee">
+  <div class="marquee__track" id="marqueeTrack"></div>
+  <button class="marquee__zone" data-type="prev" aria-label="Previous"></button>
+  <button class="marquee__zone" data-type="next" aria-label="Next"></button>
+</section>
+<div class="gcursor" id="galCursor" data-type="" aria-hidden="true"><span class="gcursor__label btn-label"></span></div>
+
+<!-- ================= STORES ================= -->
+<section class="stores" id="stores">
+  <div class="stores__head">
+    <h2>Visit Our Stores</h2>
+    <div class="toggle" id="storeToggle">
+      <span class="toggle__pill" id="togglePill"></span>
+      <button class="on" data-region="india">
+        <span class="flag">
+          <svg viewBox="0 0 20 20"><rect width="20" height="20" fill="#F0F0F0"/><rect x="0" y="0" width="20" height="6.6" fill="#FF9811"/><rect x="0" y="13.4" width="20" height="6.6" fill="#6DA544"/><circle cx="10" cy="10" r="2.6" fill="none" stroke="#3D58DB" stroke-width="1"/></svg>
+        </span>India
+      </button>
+      <button data-region="uae">
+        <span class="flag">
+          <svg viewBox="0 0 20 20"><rect width="20" height="20" fill="#F0F0F0"/><rect x="6" y="13.3" width="14" height="6.7" fill="#000"/><rect x="6" y="0" width="14" height="6.7" fill="#6DA544"/><rect x="0" y="0" width="7" height="20" fill="#A2001D"/></svg>
+        </span>UAE
+      </button>
+    </div>
+  </div>
+  <div class="stores__grid" id="storesGrid"></div>
+</section>
+
+<!-- ================= FORM + FAQ ================= -->
+<section class="convert" id="book">
+  <div class="convert__wrap">
+    <form class="form" id="bookForm" novalidate>
+      <div class="form__head">
+        <h2>Book A Private Viewing</h2>
+        <p>Tell us how to reach you and an advisor will take it from there, at whichever store suits you best.</p>
+      </div>
+      <div class="field">
+        <input type="text" id="fName" placeholder=" " autocomplete="name" required>
+        <label for="fName">Full Name*</label>
+      </div>
+      <div class="phone">
+        <div class="phone__code">+971
+          <svg viewBox="0 0 12 12" fill="none"><path d="m2.5 4.5 3.5 3.5 3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="field">
+          <input type="tel" id="fPhone" placeholder=" " autocomplete="tel" required>
+          <label for="fPhone">Mobile Number *</label>
+        </div>
+      </div>
+      <button class="btn-solid btn-label" type="submit">Book An Appointment</button>
+    </form>
+
+    <div class="faqs" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="foot">
+  <span class="foot__c">© 2026 Jaipur Gems</span>
+  <span class="foot__pay">
+    <span>Visa</span><span>Mastercard</span><span>Amex</span><span>PayPal</span><span>Diners</span><span>Discover</span>
+  </span>
+</footer>
+
+<script>
+/* ============================================================
+   0 — viewport helper
+   ============================================================ */
+const mqMobile = window.matchMedia('(max-width:767px)');
+const isMobile = () => mqMobile.matches;
+
+/* ============================================================
+   1 — header: Top Reverse over the hero, Default once past it
+   ============================================================ */
+const hdr = document.getElementById('hdr');
+const HDR_TRIGGER = 8;                     /* the overlay bar arrives the moment you start scrolling */
+let hdrTick = false;
+function syncHeader(){
+  hdr.classList.toggle('is-solid', window.scrollY > HDR_TRIGGER);
+  hdrTick = false;
+}
+window.addEventListener('scroll', () => {
+  if (!hdrTick) { hdrTick = true; requestAnimationFrame(syncHeader); }
+}, { passive:true });
+syncHeader();
+
+/* ============================================================
+   2 — hero: art-directed sources, cross-fade every 3s
+   ============================================================ */
+const heroSlides = [...document.querySelectorAll('.hero__slide')];
+const craftSlides = [...document.querySelectorAll('.craft__slide')];
+function paintBackgrounds(){
+  const key = isMobile() ? 'm' : 'd';
+  [...heroSlides, ...craftSlides].forEach(el => {
+    el.style.backgroundImage = 'url("' + el.dataset[key] + '")';
+  });
+}
+paintBackgrounds();
+mqMobile.addEventListener('change', paintBackgrounds);
+
+/* Brand mode ships one hero frame; the cross-fade only runs if more are added */
+if (heroSlides.length > 1) {
+  let heroI = 0;
+  setInterval(() => {
+    heroSlides[heroI].classList.remove('is-on');
+    heroI = (heroI + 1) % heroSlides.length;
+    heroSlides[heroI].classList.add('is-on');
+  }, 3000);
+}
+
+/* ============================================================
+   3 — brand: unmask reveal (replays), image swaps per fold
+   ============================================================ */
+/* Scroll-driven rather than IntersectionObserver: sticky positioning plus an
+   observer proved fragile, and a stuck-closed clip-path hides the image entirely. */
+const brandFrame = document.getElementById('brandFrame');
+brandFrame.classList.add('armed');
+function syncBrandReveal(){
+  const r = brandFrame.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+  brandFrame.classList.toggle('is-open', r.height > 0 && visible / r.height > 0.2);
+}
+let brandTick = false;
+function queueBrandReveal(){
+  if (brandTick) return;
+  brandTick = true;
+  requestAnimationFrame(() => { brandTick = false; syncBrandReveal(); });
+}
+window.addEventListener('scroll', queueBrandReveal, { passive:true });
+window.addEventListener('resize', queueBrandReveal);
+syncBrandReveal();
+
+const brandImgs = [document.getElementById('brandImg1'), document.getElementById('brandImg2')];
+const foldIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const i = +e.target.dataset.img;
+    brandImgs.forEach((img, n) => img.classList.toggle('is-on', n === i));
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.brand__fold').forEach(f => foldIO.observe(f));
+
+/* ============================================================
+   4 — USP cards
+   ============================================================ */
+const USPS = [
+  { i:'handmade',   t:'Designed &amp; Crafted In-House' },
+  { i:'experience', t:'Since 1975 · 60 Years of Experience' },
+  { i:'expertise',  t:'Six Generations of Expertise' },
+  { i:'unique',     t:'Every Piece, One of a Kind' }
+];
+const uspRow = document.getElementById('uspRow');
+uspRow.innerHTML = USPS.map(u =>
+  '<article class="usp__card">'
+  + '<div class="usp__ico"><div class="usp__disc">'
+  +   '<img src="assets/usp-' + u.i + '.svg" alt="" width="48" height="48">'
+  + '</div></div>'
+  + '<div class="usp__txt">' + u.t + '</div>'
+  + '</article>'
+).join('');
+{
+  const cards = [...uspRow.children];
+  if (isMobile()) {
+    /* side-scrolled strip: cards 3 and 4 start off-screen, so watch the row
+       and bring the set in together rather than popping in on swipe */
+    cards.forEach(c => { c.style.transitionDelay = '0ms'; });
+    new IntersectionObserver(([e]) => {
+      cards.forEach(c => c.classList.toggle('in', e.isIntersecting));
+    }, { threshold: 0.1 }).observe(uspRow);
+  } else {
+    cards.forEach((c, i) => { c.style.transitionDelay = (i * 130) + 'ms'; });
+    const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('in', e.isIntersecting)), { threshold: 0.2 });
+    cards.forEach(c => io.observe(c));
+  }
+}
+
+/* ============================================================
+   5 — craftsmanship slider
+   ============================================================ */
+const CRAFT = [
+  { tab:'The Art',      title:'It begins on paper',
+    body:'A piece is argued over in pencil long before any gold is cut. Proportion is settled here, and proportion is what you notice decades later.' },
+  { tab:'The Craft',    title:'The quiet of a workshop',
+    body:'A craftsman may live with a single piece for weeks. They know its weight, where it catches the light, and when it is not yet finished.' },
+  { tab:'The Material', title:'The stone comes first',
+    body:'We buy a stone before we know what it will become. Six generations have taught us to let the material lead and the design follow.' }
+];
+const SLIDE_MS = 5000;
+const craftTabs = document.getElementById('craftTabs');
+const craftCopy = document.getElementById('craftCopy');
+const craftTitle = document.getElementById('craftTitle');
+const craftBody = document.getElementById('craftBody');
+
+craftTabs.innerHTML = CRAFT.map((c, i) =>
+  (i ? '<span class="craft__link"></span>' : '')
+  + '<button class="craft__tab' + (i ? '' : ' on') + '" data-i="' + i + '">'
+  +   '<span class="fill"></span><span class="lbl btn-label">' + c.tab + '</span>'
+  + '</button>'
+).join('');
+
+const tabEls = [...craftTabs.querySelectorAll('.craft__tab')];
+tabEls.forEach((t, i) => { t.style.transitionDelay = (i * 140) + 'ms'; });
+
+let craftI = 0, craftTimer = null, craftLive = false;
+
+function paintCraft(i, animateBar){
+  craftSlides.forEach((s, n) => s.classList.toggle('is-on', n === i));
+  tabEls.forEach((t, n) => t.classList.toggle('on', n === i));
+
+  craftCopy.classList.remove('is-on');
+  craftTitle.textContent = CRAFT[i].title;
+  craftBody.textContent = CRAFT[i].body;
+  void craftCopy.offsetWidth;
+  craftCopy.classList.add('is-on');
+
+  /* progress bar lives inside the active pill */
+  tabEls.forEach(t => {
+    const bar = t.querySelector('.fill');
+    bar.style.transition = 'none';
+    bar.style.transform = 'scaleX(0)';
+  });
+  if (animateBar) {
+    const bar = tabEls[i].querySelector('.fill');
+    void bar.offsetWidth;
+    bar.style.transition = 'transform ' + SLIDE_MS + 'ms linear';
+    bar.style.transform = 'scaleX(1)';
+  }
+}
+
+function startCraft(){
+  stopCraft();
+  paintCraft(craftI, true);
+  craftTimer = setInterval(() => {
+    craftI = (craftI + 1) % CRAFT.length;
+    paintCraft(craftI, true);
+  }, SLIDE_MS);
+}
+function stopCraft(){ if (craftTimer) { clearInterval(craftTimer); craftTimer = null; } }
+
+tabEls.forEach(t => {
+  const go = () => { craftI = +t.dataset.i; if (craftLive) startCraft(); else paintCraft(craftI, false); };
+  t.addEventListener('mouseenter', () => { if (!isMobile()) go(); });   /* hovering a tab reveals its slide */
+  t.addEventListener('click', go);
+});
+
+new IntersectionObserver(([e]) => {
+  craftLive = e.isIntersecting;
+  craftTabs.classList.toggle('in', e.isIntersecting);
+  if (e.isIntersecting) {
+    /* let the tabs finish arriving before the first bar runs */
+    setTimeout(() => { if (craftLive) startCraft(); }, tabEls.length * 140 + 200);
+  } else {
+    stopCraft();
+  }
+}, { threshold: 0.4 }).observe(document.getElementById('craft'));
+
+/* ============================================================
+   6 — video banner: viewport-matched source, plays in view
+   ============================================================ */
+const bannerVideo = document.getElementById('bannerVideo');
+function setBannerSrc(){
+  const want = 'assets/banner-' + (isMobile() ? 'mobile' : 'desktop') + '.mp4';
+  if (!bannerVideo.src.endsWith(want)) { bannerVideo.src = want; bannerVideo.load(); }
+}
+setBannerSrc();
+mqMobile.addEventListener('change', setBannerSrc);
+new IntersectionObserver(([e]) => {
+  if (e.isIntersecting) bannerVideo.play().catch(() => {}); else bannerVideo.pause();
+}, { threshold: 0.25 }).observe(document.getElementById('banner'));
+
+/* ============================================================
+   7 — scrolling image gallery
+   ============================================================ */
+const GALLERY = ['assets/gallery-1.webp','assets/gallery-2.webp','assets/gallery-3.webp','assets/gallery-4.webp','assets/gallery-5.webp'];
+const marquee = document.getElementById('marquee');
+const track = document.getElementById('marqueeTrack');
+const cell = () => (isMobile() ? 390 : 640);
+
+function buildMarquee(){
+  const one = GALLERY.map(src => '<div class="marquee__item" style="background-image:url(\'' + src + '\')"></div>').join('');
+  track.innerHTML = one + one + one;          /* three passes so the wrap is never visible */
+}
+buildMarquee();
+mqMobile.addEventListener('change', buildMarquee);
+
+let mx = 0, inView = false, userPaused = false, dragging = false, dragX = 0, dragStart = 0, resumeT = null;
+const loopWidth = () => cell() * GALLERY.length;
+const running = () => inView && !userPaused && !dragging;
+
+function tick(){
+  if (running()) mx -= 0.55;
+  const w = loopWidth();
+  if (mx <= -w) mx += w;
+  if (mx > 0) mx -= w;
+  track.style.transform = 'translate3d(' + mx + 'px,0,0)';
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+new IntersectionObserver(([e]) => { inView = e.isIntersecting; }, { threshold: 0.05 })
+  .observe(marquee);
+
+/* desktop: hovering an image pauses the scroll */
+marquee.addEventListener('mouseenter', () => { if (!isMobile()) userPaused = true; });
+marquee.addEventListener('mouseleave', () => { if (!isMobile()) userPaused = false; });
+
+/* mobile: swipe to scrub, resume shortly after the finger lifts */
+marquee.addEventListener('touchstart', e => {
+  dragging = true; dragStart = e.touches[0].clientX; dragX = mx;
+  if (resumeT) clearTimeout(resumeT);
+}, { passive:true });
+marquee.addEventListener('touchmove', e => {
+  if (!dragging) return;
+  mx = dragX + (e.touches[0].clientX - dragStart);
+}, { passive:true });
+marquee.addEventListener('touchend', () => {
+  dragging = false;
+  if (resumeT) clearTimeout(resumeT);
+  resumeT = setTimeout(() => { userPaused = false; }, 700);
+}, { passive:true });
+
+/* desktop arrows step one image at a time */
+function step(dir){
+  const target = mx - dir * cell();
+  const from = mx, delta = target - from, t0 = performance.now(), dur = 520;
+  userPaused = true;
+  (function anim(now){
+    const p = Math.min(1, (now - t0) / dur);
+    const e = 1 - Math.pow(1 - p, 3);
+    mx = from + delta * e;
+    if (p < 1) requestAnimationFrame(anim);
+    else if (!marquee.matches(':hover')) userPaused = false;
+  })(t0);
+}
+/* Madrid's cursor pattern: 200px hit zones at either edge, the native pointer
+   hidden, and a fixed label that trails the mouse via a 100ms fill-forwards
+   animation. data-type on the cursor drives the fade. */
+const galCursor = document.getElementById('galCursor');
+const galLabel  = galCursor.querySelector('.gcursor__label');
+const LABELS = { prev:'Previous', next:'Next' };
+
+function animateCursor(e){
+  const x = e.clientX - galCursor.offsetWidth / 2;
+  const y = e.clientY - galCursor.offsetHeight / 2;
+  galCursor.animate({ transform: 'translate(' + x + 'px, ' + y + 'px)' },
+                    { duration: 100, fill: 'forwards' });
+}
+
+marquee.querySelectorAll('.marquee__zone').forEach(zone => {
+  const type = zone.dataset.type;
+  zone.addEventListener('mouseenter', e => {
+    if (isMobile()) return;
+    galLabel.textContent = LABELS[type];
+    galCursor.dataset.type = type;
+    animateCursor(e);
+  });
+  zone.addEventListener('mousemove', e => { if (!isMobile()) animateCursor(e); });
+  zone.addEventListener('mouseleave', () => { galCursor.dataset.type = ''; });
+  zone.addEventListener('click', () => step(type === 'prev' ? -1 : 1));
+  zone.addEventListener('blur',  () => { galCursor.dataset.type = ''; });
+});
+
+/* ============================================================
+   8 — stores
+   ============================================================ */
+const STORES = {
+  india: [
+    { city:'Mumbai', name:'Bandra', img:'assets/store-1.webp',
+      addr:'Turner Road, Bandra West,<br>Mumbai 400050, India',
+      phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM',
+      svc:['Private Viewings','High Jewellery','Bespoke Commissions'] },
+    { city:'Mumbai', name:'Girgaon', img:'assets/store-2.webp',
+      addr:'Hughes Road, Girgaon,<br>Mumbai 400007, India',
+      phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM',
+      svc:['Private Viewings','Bridal Consultation','After-Sales Care'] },
+    { city:'Chennai', name:'Anna Salai', img:'assets/store-3.webp',
+      addr:'Anna Salai, Chennai,<br>Tamil Nadu, India',
+      phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM',
+      svc:['Private Viewings','Bridal Consultation','Bespoke Commissions'] },
+    { city:'Coimbatore', name:'Race Course', img:'assets/store-2.webp',
+      addr:'Race Course, Coimbatore,<br>Tamil Nadu, India',
+      phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM',
+      svc:['Private Viewings','Bridal Consultation','Gemstone Expertise'] }
+  ],
+  uae: [
+    { city:'Abu Dhabi', name:'Nation Towers', img:'assets/store-4.webp',
+      addr:'Nation Towers, 1st Street, Al Bateen,<br>W44, Abu Dhabi, UAE',
+      phone:'+971 2517 6220', hours:'Open 10:00 AM – 10:00 PM',
+      svc:['Private Viewings','Bridal Consultation','Virtual Appointments'] },
+    { city:'Dubai', name:'Galleria Mall', img:'assets/store-3.webp',
+      addr:'Galleria Mall, Ground Floor, F&amp;B-10,<br>329 Street, Al Barsha 2, Dubai, UAE',
+      phone:'+971 2517 6221', hours:'Open 10:00 AM – 10:00 PM',
+      svc:['Private Viewings','Bridal Consultation','Virtual Appointments'] }
+  ]
+};
+const storesGrid = document.getElementById('storesGrid');
+function renderStores(region){
+  storesGrid.innerHTML = STORES[region].map(s =>
+    '<article class="store">'
+    + '<div class="store__img" style="background-image:url(\'' + s.img + '\')"></div>'
+    + '<div class="store__body">'
+    +   '<div class="store__pad">'
+    +     '<div class="store__head"><span class="store__city">' + s.city + '</span>'
+    +       '<span class="store__name">' + s.name + '</span></div>'
+    +     '<div class="store__rows">'
+    +       '<div>' + s.addr + '</div>'
+    +       '<div>' + s.phone + '</div>'
+    +       '<div class="store__hours"><span class="d">Mon – Sun</span> &nbsp;' + s.hours + '</div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="store__svc">'
+    +     s.svc.map(t => '<span class="store__tag"><span class="nugget"></span>' + t + '</span>').join('')
+    +   '</div>'
+    + '</div></article>'
+  ).join('');
+  storesGrid.scrollLeft = 0;
+  revealStores();
+}
+let storeIO = null;
+function revealStores(){
+  const cards = [...storesGrid.querySelectorAll('.store')];
+  if (storeIO) storeIO.disconnect();
+
+  if (isMobile()) {
+    /* the strip is side-scrolled, so off-screen cards would never trigger —
+       watch the wrapper instead and bring the whole set in together */
+    cards.forEach(c => { c.style.transitionDelay = '0ms'; });
+    storeIO = new IntersectionObserver(([e]) => {
+      cards.forEach(c => c.classList.toggle('in', e.isIntersecting));
+    }, { threshold: 0.1 });
+    storeIO.observe(storesGrid);
+  } else {
+    cards.forEach((c, i) => { c.style.transitionDelay = (i * 120) + 'ms'; });
+    storeIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('in', e.isIntersecting)), { threshold: 0.15 });
+    cards.forEach(c => storeIO.observe(c));
+  }
+}
+
+const toggle = document.getElementById('storeToggle');
+const togglePill = document.getElementById('togglePill');
+function movePill(btn){
+  togglePill.style.width = btn.offsetWidth + 'px';
+  togglePill.style.transform = 'translateX(' + (btn.offsetLeft - toggle.querySelector('button').offsetLeft) + 'px)';
+}
+toggle.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    toggle.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+    movePill(btn);
+    renderStores(btn.dataset.region);
+  });
+});
+renderStores('india');
+window.addEventListener('load', () => movePill(toggle.querySelector('button.on')));
+window.addEventListener('resize', () => movePill(toggle.querySelector('button.on')));
+movePill(toggle.querySelector('button.on'));
+
+/* ============================================================
+   9 — FAQ
+   ============================================================ */
+const FAQS = [
+  { q:'How long will the viewing take?',
+    a:'An hour is typical. Bridal and high jewellery appointments often run longer, and we never rush a table. Tell us your occasion and we will plan the time accordingly.' },
+  { q:'Do I need an appointment?',
+    a:'Walk-ins are always welcome at both boutiques. Booking simply means an advisor is expecting you and the pieces you want to see are ready when you arrive.' },
+  { q:'Do you take custom orders?',
+    a:'Yes. Bring a reference or an idea and our own atelier will draw it. You will receive a no obligation estimate and creative guidance before anything begins.' },
+  { q:'Why do some pieces show price on request?',
+    a:'High jewellery and one of a kind pieces are priced by their stones, so no two are alike. Your advisor will share the price in person or over WhatsApp.' },
+  { q:'What happens at a private viewing?',
+    a:'A private room, one family at a time, and a selection laid out for your occasion. Your advisor stays with you throughout. There is no obligation to buy.' }
+];
+const faqList = document.getElementById('faqList');
+faqList.innerHTML = FAQS.map(f =>
+  '<div class="faq">'
+  + '<button class="faq__q" type="button" aria-expanded="false">' + f.q + '<span class="faq__sign"></span></button>'
+  + '<div class="faq__a"><p>' + f.a + '</p></div>'
+  + '</div>'
+).join('');
+faqList.querySelectorAll('.faq').forEach(item => {
+  const btn = item.querySelector('.faq__q');
+  const panel = item.querySelector('.faq__a');
+  btn.addEventListener('click', () => {
+    const open = item.classList.contains('open');
+    faqList.querySelectorAll('.faq.open').forEach(o => {
+      o.classList.remove('open');
+      o.querySelector('.faq__a').style.maxHeight = null;
+      o.querySelector('.faq__q').setAttribute('aria-expanded','false');
+    });
+    if (!open) {
+      item.classList.add('open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      btn.setAttribute('aria-expanded','true');
+    }
+  });
+});
+
+/* ============================================================
+   10 — form
+   ============================================================ */
+document.getElementById('bookForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-solid');
+  const was = btn.textContent;
+  btn.textContent = 'Request received';
+  setTimeout(() => { btn.textContent = was; }, 2400);
+});
+
+/* ============================================================
+   11 — typography: keep the last two words together
+   ============================================================ */
+document.querySelectorAll('h1, h2, h3, .hero__sub, .brand__body p, .craft__copy p, .banner__copy p, .form__head p')
+  .forEach(el => {
+    if (el.children.length && !el.querySelector('br')) return;
+    el.innerHTML = el.innerHTML.replace(/\s+(\S+)\s*$/, ' $1');
+  });
+</script>
+</body>
+</html>
