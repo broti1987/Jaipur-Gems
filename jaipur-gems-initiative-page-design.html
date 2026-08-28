@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Jaipur Gems — The House of High Jewellery</title>
+<title>Jaipur Gems — The Bridal Viewing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gotu&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -180,6 +180,25 @@ p{margin:0;text-wrap:pretty;}
 .brand__head{display:flex;flex-direction:column;gap:16px;}
 .brand h2{font-size:24px;color:var(--black);}
 .brand p{font-size:12px;line-height:1.6;color:var(--black);}
+
+/* Info cards — the two viewing locations. Corners are uneven in the file:
+   4px top-left, 24px on the other three, with a 3x16 crimson tab on the header. */
+.icards{display:flex;gap:24px;margin-top:12px;}
+.icard{
+  flex:1;background:var(--sand-50);border:1px solid var(--sand-400);
+  border-radius:4px 24px 24px 24px;
+}
+.icard__h{
+  position:relative;border-radius:4px 24px 0 0;
+  background:var(--sand-100);border-bottom:1px solid var(--sand-400);padding:12px 24px;
+  font-family:var(--ui);font-weight:600;font-size:10px;line-height:1.3;
+  letter-spacing:.10em;text-transform:uppercase;color:var(--sand-800);
+}
+.icard__h::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:16px;background:var(--crimson);
+}
+.icard__b{padding:12px 24px 24px;font-size:10px;line-height:1.7;color:var(--sand-800);}
 
 /* ============================================================
    USP section
@@ -528,6 +547,8 @@ p{margin:0;text-wrap:pretty;}
   .btn-under{min-width:0;}
   .scroll-arrow{right:24px;bottom:24px;top:auto;transform:none;}
 
+  .icards{flex-direction:column;gap:16px;margin-top:0;}
+
   .brand{display:block;}
   .brand__media{position:static;height:auto;}
   .brand__frame{width:100%;height:auto;aspect-ratio:1;}
@@ -622,23 +643,23 @@ p{margin:0;text-wrap:pretty;}
   </a>
   <div class="hdr__right">
     <img class="hdr__mono" src="assets/logomark.svg" alt="" aria-hidden="true">
-    <a class="hdr__cta btn-label" href="#book">Book A Store Visit</a>
+    <a class="hdr__cta btn-label" href="#book">Request An Invite</a>
   </div>
 </header>
 
 <!-- ================= HERO ================= -->
 <section class="hero" id="hero">
   <div class="hero__stage" id="heroStage">
-    <div class="hero__slide is-on" data-d="assets/hero-brand-desktop.webp" data-m="assets/hero-brand-mobile.webp"></div>
+    <div class="hero__slide is-on" data-d="assets/hero-initiative-desktop.webp" data-m="assets/hero-initiative-mobile.webp"></div>
   </div>
   <div class="hero__scrim"></div>
 
   <div class="hero__inner">
     <div class="hero__copy">
-      <h1>Jewellery with Quiet Elegance</h1>
-      <p class="hero__sub">Handcrafted polki and uncut diamonds, designed in Jaipur for the moments that matter.</p>
+      <h1>The Bridal Rooms, from Mumbai to the UAE</h1>
+      <p class="hero__sub">Exclusive pieces from Mumbai, in Abu Dhabi and Dubai for three weeks only.</p>
       <a class="btn-under" href="#book">
-        <span class="btn-under__row"><span class="btn-label btn-under__label">Book a store visit</span><span class="nugget"></span></span>
+        <span class="btn-under__row"><span class="btn-label btn-under__label">Request an invite</span><span class="nugget"></span></span>
         <span class="btn-under__rule"></span>
       </a>
     </div>
@@ -650,12 +671,20 @@ p{margin:0;text-wrap:pretty;}
   </div>
 </section>
 
+<!-- ================= SCROLLING GALLERY ================= -->
+<section class="marquee" id="marquee">
+  <div class="marquee__track" id="marqueeTrack"></div>
+  <button class="marquee__zone" data-type="prev" aria-label="Previous"></button>
+  <button class="marquee__zone" data-type="next" aria-label="Next"></button>
+</section>
+<div class="gcursor" id="galCursor" data-type="" aria-hidden="true"><span class="gcursor__label btn-label"></span></div>
+
 <!-- ================= BRAND ================= -->
 <section class="brand" id="brand">
   <div class="brand__media">
     <div class="brand__frame" id="brandFrame">
-      <img id="brandImg1" src="assets/brand-1.webp" alt="">
-      <img class="top" id="brandImg2" src="assets/brand-2.webp" alt="">
+      <img id="brandImg1" src="assets/initiative-1.webp" alt="">
+      <img class="top" id="brandImg2" src="assets/initiative-2.webp" alt="">
     </div>
   </div>
 
@@ -663,20 +692,30 @@ p{margin:0;text-wrap:pretty;}
     <div class="brand__fold" data-img="0">
       <div class="brand__body">
         <div class="brand__head">
-          <span class="eyebrow">The House of High Jewellery</span>
-          <h2>Six generations of expertise</h2>
+          <span class="eyebrow">By invite only</span>
+          <h2>The Bridal Viewing, this season</h2>
         </div>
-        <p>Jaipur Gems opened in Mumbai in 1974, but the family&rsquo;s understanding of gemstones runs six generations deep. That knowledge is the inheritance, the reason a piece is proportioned the way it is, and still worth wearing decades later.</p>
+        <p>For three weeks, our bridal Jadau, the five-layer Polki necklace, the Aad, the Haath Phool, is shown privately in Abu Dhabi and Dubai. Pieces normally held in Mumbai, here for this period only.</p>
+        <div class="icards">
+          <div class="icard">
+            <div class="icard__h">Abu Dhabi</div>
+            <div class="icard__b">Nation Towers, 1st Street,<br>Al Bateen.</div>
+          </div>
+          <div class="icard">
+            <div class="icard__h">Dubai</div>
+            <div class="icard__b">Galleria Mall, Ground Floor,<br>Al Barsha 2.</div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="brand__fold brand__fold--2" data-img="1">
       <div class="brand__body">
         <div class="brand__head">
-          <span class="eyebrow">Crafted for Eternity</span>
-          <h2>One atelier, start to finish</h2>
+          <span class="eyebrow">How the viewing works</span>
+          <h2>An hour, entirely yours</h2>
         </div>
-        <p>Every piece is drawn, set, and finished by our own craftsmen. We buy no pre-set jewellery and outsource nothing. Stones are chosen before a piece is drawn, slower, and the only way we can guarantee it.</p>
+        <p>Tell us the occasion and the room is prepared before you arrive, pieces selected for it, nothing else on the table. If something is close but not right, our atelier can adapt it, or begin again.</p>
       </div>
     </div>
 
@@ -713,14 +752,6 @@ p{margin:0;text-wrap:pretty;}
     <p>Handcrafted polki and uncut diamonds, designed in Jaipur<br>for the moments that matter.</p>
   </div>
 </section>
-
-<!-- ================= SCROLLING GALLERY ================= -->
-<section class="marquee" id="marquee">
-  <div class="marquee__track" id="marqueeTrack"></div>
-  <button class="marquee__zone" data-type="prev" aria-label="Previous"></button>
-  <button class="marquee__zone" data-type="next" aria-label="Next"></button>
-</section>
-<div class="gcursor" id="galCursor" data-type="" aria-hidden="true"><span class="gcursor__label btn-label"></span></div>
 
 <!-- ================= STORES ================= -->
 <section class="stores" id="stores">
@@ -1071,7 +1102,7 @@ new IntersectionObserver(([e]) => {
 /* ============================================================
    7 — scrolling image gallery
    ============================================================ */
-const GALLERY = ['assets/gallery-1.webp','assets/gallery-2.webp','assets/gallery-3.webp','assets/gallery-4.webp','assets/gallery-5.webp'];
+const GALLERY = ['assets/initiative-gallery-1.webp','assets/initiative-gallery-2.webp','assets/initiative-gallery-3.webp','assets/initiative-gallery-4.webp'];
 const marquee = document.getElementById('marquee');
 const track = document.getElementById('marqueeTrack');
 const cell = () => (isMobile() ? 390 : 640);
