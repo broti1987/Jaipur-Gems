@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JG Scroll Hint Arrow — PDP</title>
+
+<!-- ============================================================
+     JG SCROLL HINT ARROW — PDP variant
+     Dotted extension line on top that grows to fill the container,
+     with the fixed arrow unit pinned at the bottom.
+     Decorative. Unpositioned.
+
+     Copy the <style> block and the .jg-arrow markup below.
+     The parent must have a definite height — the extension line is
+     flex:1 0 0 and needs something to grow into.
+     ============================================================ -->
+
+<style>
+.jg-arrow{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  width:8px;
+  height:100%;                     /* stretches to the container */
+  pointer-events:none;
+}
+
+/* dotted extension — 1px dash, 2px gap (Figma dashPattern [1,2]) */
+.jg-arrow__ext{
+  flex:1 0 0;
+  min-height:0;
+  width:1px;
+  background-image:repeating-linear-gradient(
+    to bottom,
+    #61533D 0, #61533D 1px,        /* Sand 800 */
+    transparent 1px, transparent 3px
+  );
+}
+
+/* fixed block at the bottom — 8 x 74px */
+.jg-arrow__unit{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+}
+
+.jg-arrow__track{
+  position:relative;
+  width:1px;
+  height:64px;
+  background:#B59E7D;              /* Sand 600 */
+  overflow:hidden;
+}
+
+.jg-arrow__fill{
+  position:absolute;
+  left:0; top:0;
+  width:1px;
+  height:100%;                     /* follows the track height */
+  background:#850000;              /* Crimson */
+  animation:jgArrowRun 2.4s cubic-bezier(.65,.05,.36,1) infinite;
+}
+
+/* segment enters from above, exits below, then holds before repeating */
+@keyframes jgArrowRun{
+  0%        { transform:translateY(-100%); }
+  70%, 100% { transform:translateY(100%); }
+}
+
+/* brand nugget — 4px square rotated 45deg, centred in an 8px box */
+.jg-arrow__nugget{
+  width:8px;
+  height:8px;
+  position:relative;
+  flex:none;
+}
+.jg-arrow__nugget::after{
+  content:'';
+  position:absolute;
+  left:50%; top:50%;
+  width:4px; height:4px;
+  background:#B59E7D;              /* Sand 600 */
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .jg-arrow__fill{ animation:none; }
+}
+</style>
+</head>
+<body style="margin:0;padding:24px">
+
+<!-- the wrapper is only here to give the extension line a height to grow into;
+     in the PDP this is the product copy block -->
+<div style="height:180px">
+  <div class="jg-arrow" aria-hidden="true">
+    <span class="jg-arrow__ext"></span>
+    <span class="jg-arrow__unit">
+      <span class="jg-arrow__track"><span class="jg-arrow__fill"></span></span>
+      <span class="jg-arrow__nugget"></span>
+    </span>
+  </div>
+</div>
+
+</body>
+</html>

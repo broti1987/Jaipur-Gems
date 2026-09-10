@@ -1,0 +1,63 @@
+<!-- ============================================================
+     JG SCROLL HINT ARROW
+     Decorative. Unpositioned — place it wherever it's needed.
+     Renders at 8 x 74px.
+     ============================================================ -->
+
+<style>
+.scroll-arrow{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  pointer-events:none;
+}
+
+.scroll-arrow__track{
+  position:relative;
+  width:1px;
+  height:64px;
+  background:#B59E7D;              /* Sand 600 */
+  overflow:hidden;
+}
+
+.scroll-arrow__fill{
+  position:absolute;
+  left:0; top:0;
+  width:1px;
+  height:64px;
+  background:#850000;              /* Crimson */
+  animation:arrowRun 2.4s cubic-bezier(.65,.05,.36,1) infinite;
+}
+
+/* segment enters from above, exits below, then holds before repeating */
+@keyframes arrowRun{
+  0%        { transform:translateY(-100%); }
+  70%, 100% { transform:translateY(100%); }
+}
+
+/* brand nugget — 4px square rotated 45deg, centred in an 8px box */
+.scroll-arrow__nugget{
+  width:8px;
+  height:8px;
+  position:relative;
+  flex:none;
+}
+.scroll-arrow__nugget::after{
+  content:'';
+  position:absolute;
+  left:50%; top:50%;
+  width:4px; height:4px;
+  background:#B59E7D;              /* Sand 600 */
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .scroll-arrow__fill{ animation:none; }
+}
+</style>
+
+<div class="scroll-arrow" aria-hidden="true">
+  <span class="scroll-arrow__track"><span class="scroll-arrow__fill"></span></span>
+  <span class="scroll-arrow__nugget"></span>
+</div>
