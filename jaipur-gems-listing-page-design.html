@@ -19,6 +19,9 @@
   --ink:#14110F; --black:#000000; --white:#FFFFFF;
   --crimson:#850000;
   --hair:#D9D9D9;
+  /* the tag and dot bands on the compact mobile card — a shade off Sand 400,
+     so the top of the card reads as one tinted panel. Not a token yet. */
+  --card-band:#EFE4D0;
 
   --display:'Gotu',serif;
   --ui:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -28,11 +31,11 @@
   --hdr-d:80px;
   --hdr-m:64px;
 
-  /* grid: 4 x 330 cards inside 1376, hero tile takes half the width */
-  --cols:4;
+  /* grid: 3 x 448 cards inside 1376; the hero tile takes two slots */
+  --cols:3;
   --ed-span:2;
-  --col-gap:18.67px;
-  --row-gap:40px;
+  --col-gap:16px;
+  --row-gap:16px;
 }
 
 *,*::before,*::after{box-sizing:border-box;}
@@ -125,15 +128,17 @@ input{font:inherit;color:inherit;}
 }
 .chips{display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none;}
 .chips::-webkit-scrollbar{display:none;}
+/* Default: Sand 600 hairline. Hover: the rule and label go to ink.
+   Active: filled Sand 700 with a Sand 50 label. */
 .chip{
   flex:none;padding:11px 20px;border-radius:999px;
-  border:1px solid var(--sand-600);color:var(--sand-900);
+  border:1px solid var(--sand-600);color:var(--sand-900);background:transparent;
   font-family:var(--ui);font-weight:600;font-size:10px;line-height:1.2;
   letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
-  transition:border-color .25s ease,color .25s ease;
+  transition:border-color .25s ease,color .25s ease,background-color .25s ease;
 }
-.chip:hover{border-color:var(--sand-800);color:var(--sand-1000);}
-.chip.on{border-color:var(--black);color:var(--black);}
+.chip:not(.on):hover{border-color:var(--black);color:var(--black);}
+.chip.on{background:var(--sand-700);border-color:var(--sand-700);color:var(--sand-50);}
 
 .ctrls{display:flex;align-items:center;gap:24px;flex:none;}
 .ctrl{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--sand-1000);transition:color .25s ease;}
@@ -179,7 +184,9 @@ input{font:inherit;color:inherit;}
 }
 
 /* Card/Product Card */
-.card{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;position:relative;}
+/* the bottom padding holds the Quick View slot: 12px clear of the info row, then the button */
+.card{display:flex;flex-direction:column;gap:12px;padding-bottom:36px;position:relative;}
+.card__top{position:relative;display:flex;flex-direction:column;}
 .card__img{position:relative;aspect-ratio:1/1;background:var(--sand-400);overflow:hidden;}
 .card__img>img{
   width:100%;height:100%;object-fit:cover;
@@ -220,7 +227,8 @@ input{font:inherit;color:inherit;}
 }
 /* Quick View — reserved in the flow so nothing shifts; the rule draws itself in
    with the card, then re-wipes if you go on to hover the button */
-.card__qv{align-self:flex-start;height:28px;color:var(--black);}
+/* sits inside the card's bottom padding, so revealing it never reflows the grid */
+.card__qv{position:absolute;left:0;bottom:0;height:24px;color:var(--black);}
 .card__qv .ul__c{opacity:0;transition:opacity .28s ease,gap .35s ease;}
 .card__qv .ul__r{transform:scaleX(0);transition:transform .5s cubic-bezier(.22,1,.36,1) .06s;}
 .card:hover .card__qv .ul__c{opacity:1;}
@@ -252,6 +260,7 @@ input{font:inherit;color:inherit;}
 .slide{
   grid-column:1/-1;position:relative;overflow:hidden;min-height:700px;background:var(--sand-200);
   display:flex;flex-direction:column;justify-content:flex-end;padding:56px;
+  margin:8px 0;   /* the grid bands sit 24px apart; rows inside a band sit 16px */
 }
 .slide>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .slide__scrim{
@@ -300,7 +309,8 @@ input{font:inherit;color:inherit;}
   letter-spacing:.10em;text-transform:uppercase;color:var(--crimson);
 }
 .conc__top h2{font-size:24px;color:var(--sand-800);max-width:686px;}
-.conc__top p{font-size:12px;line-height:1.6;color:var(--black);}
+/* breaks itself into two even lines at any width — no hardcoded <br> to strand a word */
+.conc__top p{font-size:12px;line-height:1.6;color:var(--black);max-width:560px;text-wrap:balance;}
 .conc__row{display:flex;align-items:stretch;justify-content:center;gap:160px;}
 .cta{width:310px;padding:0 36px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
 .cta__icon{
@@ -317,6 +327,15 @@ input{font:inherit;color:inherit;}
   transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 }
 .btn-outline:hover{background:var(--black);border-color:var(--black);color:var(--sand-100);}
+/* Button/Button Solid — same as the brand marketing pages: black pill, Sand 100 label,
+   crimson on hover, a hair of travel on press. */
+.btn-solid{
+  height:44px;padding:12px 24px;border-radius:999px;background:var(--black);color:var(--sand-100);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background-color .3s ease,transform .3s ease;
+}
+.btn-solid:hover{background:var(--crimson);}
+.btn-solid:active{transform:translateY(1px);}
 .conc__div{display:flex;flex-direction:column;align-items:center;gap:10px;align-self:stretch;}
 .conc__div .rule{flex:1;width:1px;border-left:1px dashed var(--sand-800);}
 .conc__div .tip{width:3px;height:3px;background:var(--sand-600);transform:rotate(45deg);}
@@ -364,6 +383,36 @@ input{font:inherit;color:inherit;}
 .foot__pay span{background:var(--black);border-radius:4px;padding:5px 8px;}
 
 /* ============================================================
+   Mobile control bar — density left, Sort and Filter right.
+   Fixed to the foot of the viewport; the toolbar keeps only the chips.
+   ============================================================ */
+.mbar{
+  display:none;position:fixed;left:0;right:0;bottom:0;z-index:55;
+  background:var(--sand-100);border-top:1px solid var(--sand-400);
+  align-items:center;justify-content:space-between;
+}
+.mbar .dens{flex:1;min-width:0;padding:16px;gap:10px;}
+.mbar__triggers{display:flex;align-items:center;flex:none;}
+.mbar__t{
+  width:100px;padding:16px;display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:12px;line-height:1.6;color:var(--sand-1000);transition:color .25s ease;
+}
+.mbar__t svg{width:20px;height:20px;flex:none;}
+.mbar__t:hover,.mbar__t[aria-expanded="true"]{color:var(--crimson);}
+
+/* sort options, raised from the bar */
+.msort{
+  display:none;position:fixed;left:0;right:0;bottom:53px;z-index:56;
+  background:var(--white);border-top:1px solid var(--sand-300);padding:8px 0;
+}
+.msort.on{display:block;}
+.msort button{
+  display:block;width:100%;text-align:left;padding:12px 24px;
+  font-size:12px;color:var(--sand-700);
+}
+.msort button[aria-current="true"]{color:var(--sand-1000);}
+
+/* ============================================================
    Filter drawer — Section/Filter Drawer
    ============================================================ */
 .scrim{
@@ -396,17 +445,21 @@ input{font:inherit;color:inherit;}
 .fgroup__body{display:flex;flex-wrap:wrap;gap:8px 20px;padding-top:4px;}
 .fgroup.shut .fgroup__body{display:none;}
 .opt{display:inline-flex;align-items:center;gap:4px;padding:6px 0;}
-.opt__sw{width:10px;height:10px;border-radius:999px;border:1px solid var(--sand-600);flex:none;}
-.opt__t{position:relative;display:inline-flex;flex-direction:column;gap:2px;}
-.opt__t i{font-style:normal;font-size:12px;line-height:1.4;color:var(--black);}
-.opt__t span{
-  display:block;height:1px;background:var(--sand-1000);
-  transform:scaleX(0);transform-origin:left center;transition:transform .3s cubic-bezier(.22,1,.36,1);
+/* Filter/Option now carries its state in a checkbox rather than an underline.
+   24px icon box, 16px glyph — Icon/System Icon → Checkbox Inactive / Checkbox Active. */
+.opt__cb{width:24px;height:24px;flex:none;color:var(--black);}
+.opt__cb svg{width:24px;height:24px;display:block;}
+.opt__cb .tick{
+  opacity:0;transform:scale(.55);transform-origin:12px 12px;
+  transition:opacity .18s ease,transform .28s cubic-bezier(.22,1,.36,1);
 }
-.opt:hover .opt__t i{color:var(--sand-1000);}
+.opt.on .opt__cb .tick{opacity:1;transform:none;}
+.opt__sw{width:10px;height:10px;border-radius:999px;border:1px solid var(--sand-600);flex:none;}
+.opt__t{position:relative;display:inline-flex;flex-direction:column;}
+.opt__t i{font-style:normal;font-size:12px;line-height:1.4;color:var(--black);}
 .opt.on .opt__t i{color:var(--sand-1000);}
-.opt.on .opt__t span{transform:scaleX(1);}
 .opt.off{pointer-events:none;}
+.opt.off .opt__cb{color:var(--sand-700);}
 .opt.off .opt__t i{color:var(--sand-700);}
 .opt.off .opt__t::after{
   content:'';position:absolute;left:0;right:0;top:calc(50% + 1px);height:1px;background:var(--sand-700);
@@ -425,19 +478,38 @@ input{font:inherit;color:inherit;}
   border:1px solid var(--sand-700);background:transparent;font-size:12px;color:var(--sand-700);
 }
 .range__in input:focus{outline:none;border-color:var(--sand-1000);color:var(--sand-1000);}
-.drawer__foot{padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px;}
-.drawer__clear{height:24px;color:var(--black);}
-.drawer__foot .btn-outline{width:100%;height:44px;border-color:var(--sand-600);}
+/* Apply sits solid on the left, Clear All outlined beside it — equal halves. */
+.drawer__foot{padding:32px;display:flex;align-items:center;gap:12px;}
+/* the transparent border keeps the solid half the same box model as the outlined one,
+   so flex:1 splits the row into two exactly equal pills */
+.drawer__foot .btn-solid,
+.drawer__foot .btn-outline{flex:1;min-width:0;height:44px;padding:12px;border:1px solid transparent;}
+.drawer__foot .btn-outline{border-color:var(--sand-600);}
 
-/* density: compact — five columns, hero tile still two slots */
-body.compact{--cols:5;--ed-span:2;}
+/* density: compact — five columns, hero tile still two slots.
+   At this size the name and price stack instead of sitting on one row. */
+body.compact{--cols:5;}
+body.compact .card__info{flex-direction:column;align-items:flex-start;gap:10px;}
+/* the stacked name/price already sits lower, so Quick View needs less air above it
+   than it does on the wide grid — 8px rather than 12px */
+body.compact .card{padding-bottom:32px;}
+
+/* ============================================================
+   Tablet — the concierge row is 943px at its design size, so it
+   needs a tighter gap and shrinkable CTAs before the mobile stack
+   ============================================================ */
+@media (min-width:768px) and (max-width:1023px){
+  .conc{padding:72px 32px;}
+  .conc__row{gap:48px;}
+  .cta{width:auto;flex:0 1 320px;padding:0 16px;}
+}
 
 /* ============================================================
    Mobile
    ============================================================ */
 @media (max-width:767px){
   :root{--cols:1;--ed-span:1;--col-gap:16px;--row-gap:16px;}
-  body{padding-top:var(--hdr-m);}
+  body{padding-top:var(--hdr-m);padding-bottom:53px;}   /* clears the fixed control bar */
   body.compact{--cols:2;--ed-span:2;}
 
   /* header — equal side slots keep the logotype centred */
@@ -454,13 +526,15 @@ body.compact{--cols:5;--ed-span:2;}
   /* page header — centred */
   .phead{
     padding:16px var(--gut-m);flex-direction:column;align-items:center;
-    justify-content:flex-start;gap:8px;text-align:center;
+    justify-content:flex-start;gap:6px;text-align:center;
   }
   .phead h1{font-size:24px;}
 
+  /* the toolbar carries only the chips — Filter, Sort and density sit in the bar below */
   .bar{top:var(--hdr-m);padding:16px var(--gut-m);flex-direction:column;align-items:stretch;gap:16px;}
   .chips{margin:0 calc(var(--gut-m)*-1);padding:0 var(--gut-m);}
-  .ctrls{justify-content:space-between;gap:16px;}
+  .bar .ctrls{display:none;}
+  .mbar{display:flex;}
 
   .grid-wrap{padding:16px var(--gut-m);}
   .card{padding-bottom:12px;}
@@ -478,11 +552,12 @@ body.compact{--cols:5;--ed-span:2;}
   .slide__copy p{font-size:12px;}
 
   .copy{padding:48px var(--gut-m);}
-  .conc{padding:64px var(--gut-m);gap:40px;}
+  .conc{padding:64px 24px;gap:40px;}
   .conc__row{flex-direction:column;gap:40px;align-items:center;}
   .cta{width:100%;max-width:340px;padding:0;}
-  .conc__div{flex-direction:row;align-self:auto;width:100%;max-width:200px;}
-  .conc__div .rule{flex:1;width:auto;height:1px;border-left:0;border-top:1px dashed var(--sand-800);}
+  /* stays vertical between the stacked CTAs — 24 x 72, with a 40px rule */
+  .conc__div{align-self:auto;width:24px;height:72px;gap:2px;}
+  .conc__div .rule{flex:none;width:1px;height:40px;}
 
   /* footer — brand and newsletter centred, nav links in two centred groups,
      payment row above the copyright */
@@ -503,15 +578,26 @@ body.compact{--cols:5;--ed-span:2;}
 
   .drawer{width:100%;border-radius:0;}
   .drawer__head{padding:24px 24px 16px;}
-  .fgroup{padding:0 24px 20px;}
+  .fgroup{padding:0 24px 20px;border-bottom-color:var(--sand-300);}
   .drawer__foot{padding:24px;}
 }
 
-/* smaller grid on mobile — name and price stack */
+/* Smaller grid on mobile — the card re-stacks: the tag moves above the image,
+   the dots drop below it, and the name and price centre under both. */
 @media (max-width:767px){
-  body.compact .card__info{flex-direction:column;align-items:flex-start;gap:4px;}
-  body.compact .card__price{letter-spacing:.08em;}
-  body.compact .ed{min-height:320px;padding:20px;}
+  body.compact .card{padding-bottom:12px;}
+  body.compact .card__tag{
+    position:static;writing-mode:horizontal-tb;transform:none;
+    height:24px;padding:4px;display:flex;align-items:flex-end;justify-content:center;
+    background:var(--card-band);
+  }
+  body.compact .card__dots{
+    position:static;transform:none;height:28px;padding-bottom:16px;
+    justify-content:center;opacity:1;
+    background:var(--card-band);
+  }
+  body.compact .card__info{flex-direction:column;align-items:center;text-align:center;gap:8px;}
+  body.compact .ed{min-height:478px;padding:20px;}
   body.compact .ed__cap h2{font-size:16px;}
 }
 
@@ -609,7 +695,7 @@ body.compact{--cols:5;--ed-span:2;}
   <div class="conc__top">
     <span class="conc__tag">Looking for the right design?</span>
     <h2>Lets start with a conversation</h2>
-    <p>Whether you're visiting us in Abu Dhabi or Dubai, or reaching out<br>from anywhere in the world — our advisors are here to guide you.</p>
+    <p>Whether you're visiting us in Abu Dhabi or Dubai, or reaching out from anywhere in the world — our advisors are here to guide you.</p>
   </div>
   <div class="conc__row">
     <div class="cta">
@@ -677,6 +763,38 @@ body.compact{--cols:5;--ed-span:2;}
   </div>
 </footer>
 
+<!-- ================= MOBILE CONTROL BAR ================= -->
+<div class="msort" id="mSort" role="menu">
+  <button type="button" role="menuitem">Featured</button>
+  <button type="button" role="menuitem" aria-current="true">Newest First</button>
+  <button type="button" role="menuitem">Price: Low to High</button>
+  <button type="button" role="menuitem">Price: High to Low</button>
+  <button type="button" role="menuitem">Alphabetically, A–Z</button>
+</div>
+<div class="mbar">
+  <div class="dens" id="densM">
+    <button class="on" type="button" aria-label="Wide grid"><i class="cell"></i><i class="cell"></i></button>
+    <button class="compact" type="button" aria-label="Compact grid">
+      <span class="row"><i class="cell"></i><i class="cell"></i></span>
+      <span class="row"><i class="cell"></i><i class="cell"></i></span>
+    </button>
+  </div>
+  <div class="mbar__triggers">
+    <button class="mbar__t" type="button" id="mSortBtn" aria-expanded="false">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M6 4v12M6 16l-2.5-2.5M14 16V4M14 4l2.5 2.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>Sort
+    </button>
+    <button class="mbar__t" type="button" id="mFilterBtn" aria-haspopup="dialog" aria-expanded="false">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M2.5 6h9M14.5 6h3M2.5 14h3M8.5 14h9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+        <circle cx="13" cy="6" r="1.9" stroke="currentColor" stroke-width="1.1"/>
+        <circle cx="7" cy="14" r="1.9" stroke="currentColor" stroke-width="1.1"/>
+      </svg>Filter
+    </button>
+  </div>
+</div>
+
 <!-- ================= FILTER DRAWER ================= -->
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Filter">
@@ -688,10 +806,8 @@ body.compact{--cols:5;--ed-span:2;}
   </div>
   <div class="drawer__body" id="facets"></div>
   <div class="drawer__foot">
-    <button class="ul drawer__clear" type="button" id="clearAll">
-      <span class="ul__c btn-label">Clear All</span><span class="ul__r"></span>
-    </button>
-    <button class="btn-outline btn-label" type="button" id="applyFilters">Apply</button>
+    <button class="btn-solid btn-label" type="button" id="applyFilters">Apply</button>
+    <button class="btn-outline btn-label" type="button" id="clearAll">Clear All</button>
   </div>
 </aside>
 
@@ -720,11 +836,13 @@ function cards(n, from){
 
 function card(p){
   return '<article class="card">'
-    + '<div class="card__img">'
-    +   (p.tag ? '<span class="card__tag">'+p.tag+'</span>' : '')
-    +   '<img src="'+p.img+'" alt="'+p.name+'" loading="lazy">'
-    +   '<div class="card__arrows"><button type="button" aria-label="Previous image">'+ARR_L+'</button>'
-    +     '<button type="button" aria-label="Next image">'+ARR_R+'</button></div>'
+    + '<div class="card__top">'
+    +   '<span class="card__tag">'+(p.tag || '')+'</span>'   /* always present, so the tag row aligns across a compact row */
+    +   '<div class="card__img">'
+    +     '<img src="'+p.img+'" alt="'+p.name+'" loading="lazy">'
+    +     '<div class="card__arrows"><button type="button" aria-label="Previous image">'+ARR_L+'</button>'
+    +       '<button type="button" aria-label="Next image">'+ARR_R+'</button></div>'
+    +   '</div>'
     +   '<div class="card__dots"><i class="on"></i><i></i><i></i></div>'
     + '</div>'
     + '<div class="card__info">'
@@ -772,22 +890,23 @@ const isMobile = () => window.matchMedia('(max-width:767px)').matches;
 
 function buildGrid(){
   const compact = document.body.classList.contains('compact');
-  const cols    = isMobile() ? (compact ? 2 : 1) : (compact ? 5 : 4);
+  const cols    = isMobile() ? (compact ? 2 : 1) : (compact ? 5 : 3);
   const edSpan  = isMobile() ? cols : 2;   /* the hero holds two slots at both desktop densities */
 
   let html;
   if (isMobile()) {
-    /* two cards, hero tile, six cards, banner, six more — even counts, so 1 and 2 columns both fill */
-    html = cards(2, 0) + ED + cards(6, 2) + SLIDE + cards(6, 8);
+    /* two cards, hero tile, four cards, banner, then four rows — multiples of the
+       column count, so 1 and 2 columns both fill */
+    html = cards(2, 0) + ED + cards(4, 2) + SLIDE + cards(4 * cols, 6);
   } else {
     /* Every band is a whole number of rows, so no empty cells are left at any density:
-       the hero plus `beside` cards complete rows 1–2, then two full rows, the banner,
-       then two more full rows. */
+       the hero plus `beside` cards complete rows 1–2, then three full rows, the banner,
+       then three more. 3 columns → 2 + 9 + 9; 5 columns → 6 + 15 + 15. */
     const beside = (cols - edSpan) * 2;
     html = ED + cards(beside, 0)
-         + cards(cols * 2, beside)
+         + cards(cols * 3, beside)
          + SLIDE
-         + cards(cols * 2, beside + cols * 2);
+         + cards(cols * 3, beside + cols * 3);
   }
   document.getElementById('grid').innerHTML = html + PAGINATION;
   wirePagination();
@@ -820,12 +939,22 @@ sort.querySelectorAll('.sort__menu button').forEach(function(b){
 });
 document.addEventListener('click', function(){ sort.classList.remove('open'); sortBtn.setAttribute('aria-expanded','false'); });
 
-document.getElementById('dens').addEventListener('click', function(e){
-  const b = e.target.closest('button'); if(!b) return;
-  this.querySelectorAll('button').forEach(function(x){ x.classList.remove('on'); });
-  b.classList.add('on');
-  document.body.classList.toggle('compact', b.classList.contains('compact'));
+/* both density toggles — the toolbar one and the one in the mobile bar — stay in sync */
+function setDensity(compact){
+  document.body.classList.toggle('compact', compact);
+  ['dens','densM'].forEach(function(id){
+    const host = document.getElementById(id); if(!host) return;
+    host.querySelectorAll('button').forEach(function(x){
+      x.classList.toggle('on', x.classList.contains('compact') === compact);
+    });
+  });
   buildGrid();
+}
+['dens','densM'].forEach(function(id){
+  document.getElementById(id).addEventListener('click', function(e){
+    const b = e.target.closest('button'); if(!b) return;
+    setDensity(b.classList.contains('compact'));
+  });
 });
 
 /* rebuild when the layout crosses the breakpoint */
@@ -840,7 +969,7 @@ window.addEventListener('resize', function(){
 document.getElementById('grid').addEventListener('click', function(e){
   const arrow = e.target.closest('.card__arrows button'); if(!arrow) return;
   e.preventDefault();
-  const dots = arrow.closest('.card__img').querySelectorAll('.card__dots i');
+  const dots = arrow.closest('.card__top').querySelectorAll('.card__dots i');
   let i = [].findIndex.call(dots, function(d){ return d.classList.contains('on'); });
   const next = arrow.matches(':last-child') ? (i + 1) % dots.length : (i - 1 + dots.length) % dots.length;
   dots.forEach(function(d){ d.classList.remove('on'); });
@@ -868,12 +997,21 @@ const FACETS = [
   { title:'Availability', opts:[ {l:'In stock'}, {l:'Made to order'}, {l:'Sold out', off:true} ] },
   { title:'Price', range:true },
   { title:'Metal', opts:[
-      {l:'Yellow Gold', sw:'#D4AE59'}, {l:'Rose Gold', sw:'#D9A38F'}, {l:'White Gold', sw:'#E6E6E3'} ] },
+      {l:'Yellow Gold', sw:'#D4AE59', on:true}, {l:'Rose Gold', sw:'#D9A38F'}, {l:'White Gold', sw:'#E6E6E3'} ] },
   { title:'Stone', opts:[
       {l:'Emerald', sw:'#0B6F00', on:true}, {l:'Ruby', sw:'#850000'}, {l:'Sapphire', sw:'#123A8C'},
       {l:'Tanzanite', sw:'#5C3E9B'}, {l:'Tourmaline', sw:'#B0457A'} ] },
   { title:'Category', opts:[ {l:'Necklaces'}, {l:'Earrings'}, {l:'Rings'}, {l:'Bangles'}, {l:'Bracelets'} ] }
 ];
+
+/* Icon/System Icon — Checkbox Inactive is the box alone, Checkbox Active adds the tick.
+   One markup, the tick fades and scales in on .opt.on. */
+const CBOX = '<span class="opt__cb" aria-hidden="true">'
+  + '<svg viewBox="0 0 24 24" fill="none">'
+  + '<rect x="4.5" y="4.5" width="15" height="15" rx="1.5" stroke="currentColor" stroke-width="1"/>'
+  + '<path class="tick" d="M7.6 11.8 10.6 14.8 16.6 8.8" stroke="currentColor" stroke-width="1.2"'
+  + ' stroke-linecap="round" stroke-linejoin="round"/>'
+  + '</svg></span>';
 
 document.getElementById('facets').innerHTML = FACETS.map(function(f){
   let body;
@@ -884,9 +1022,11 @@ document.getElementById('facets').innerHTML = FACETS.map(function(f){
       + '<input type="text" value="AED 4,50,000" aria-label="Maximum price"></div></div>';
   } else {
     body = f.opts.map(function(o){
-      return '<button class="opt'+(o.on?' on':'')+(o.off?' off':'')+'" type="button">'
+      return '<button class="opt'+(o.on?' on':'')+(o.off?' off':'')+'" type="button"'
+        + ' aria-pressed="'+(o.on?'true':'false')+'"'+(o.off?' aria-disabled="true"':'')+'>'
+        + CBOX
         + (o.sw ? '<span class="opt__sw" style="background:'+o.sw+'"></span>' : '')
-        + '<span class="opt__t"><i>'+o.l+'</i><span></span></span></button>';
+        + '<span class="opt__t"><i>'+o.l+'</i></span></button>';
     }).join('');
   }
   return '<div class="fgroup">'
@@ -898,10 +1038,13 @@ document.getElementById('facets').addEventListener('click', function(e){
   const head = e.target.closest('.fgroup__head');
   if(head){ head.parentElement.classList.toggle('shut'); return; }
   const opt = e.target.closest('.opt');
-  if(opt) opt.classList.toggle('on');
+  if(opt) opt.setAttribute('aria-pressed', opt.classList.toggle('on') ? 'true' : 'false');
 });
 document.getElementById('clearAll').addEventListener('click', function(){
-  document.querySelectorAll('#facets .opt.on').forEach(function(o){ o.classList.remove('on'); });
+  document.querySelectorAll('#facets .opt.on').forEach(function(o){
+    o.classList.remove('on');
+    o.setAttribute('aria-pressed','false');
+  });
 });
 
 const drawer = document.getElementById('drawer');
@@ -915,7 +1058,35 @@ function setDrawer(open){
   if(open) document.getElementById('drawerClose').focus();
 }
 filterBtn.addEventListener('click', function(){ setDrawer(true); });
+document.getElementById('mFilterBtn').addEventListener('click', function(){ setDrawer(true); });
 scrim.addEventListener('click', function(){ setDrawer(false); });
+
+/* mobile sort — the same options, raised from the control bar */
+const mSort = document.getElementById('mSort');
+const mSortBtn = document.getElementById('mSortBtn');
+mSortBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  const open = mSort.classList.toggle('on');
+  mSortBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+mSort.querySelectorAll('button').forEach(function(b){
+  b.addEventListener('click', function(){
+    [mSort, document.querySelector('.sort__menu')].forEach(function(list){
+      list.querySelectorAll('button').forEach(function(x){
+        x.toggleAttribute('aria-current', x.textContent === b.textContent);
+        if (x.textContent === b.textContent) x.setAttribute('aria-current','true');
+      });
+    });
+    document.getElementById('sortVal').textContent = b.textContent;
+    mSort.classList.remove('on');
+    mSortBtn.setAttribute('aria-expanded','false');
+  });
+});
+document.addEventListener('click', function(e){
+  if (!mSort.contains(e.target) && e.target !== mSortBtn) {
+    mSort.classList.remove('on'); mSortBtn.setAttribute('aria-expanded','false');
+  }
+});
 document.getElementById('drawerClose').addEventListener('click', function(){ setDrawer(false); });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') setDrawer(false); });
 
