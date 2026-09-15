@@ -326,7 +326,9 @@ input{font:inherit;color:inherit;}
   display:inline-flex;align-items:center;justify-content:center;color:var(--black);
   transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 }
-.btn-outline:hover{background:var(--black);border-color:var(--black);color:var(--sand-100);}
+/* Button/Button Outline → State=Hover: the pill fills to Sand 100.
+   The edge and the label do not change. */
+.btn-outline:hover{background:var(--sand-100);}
 /* Button/Button Solid — same as the brand marketing pages: black pill, Sand 100 label,
    crimson on hover, a hair of travel on press. */
 .btn-solid{
@@ -466,13 +468,17 @@ input{font:inherit;color:inherit;}
   content:'';position:absolute;left:0;right:0;top:calc(50% + 1px);height:1px;background:var(--sand-700);
 }
 .range{display:flex;flex-direction:column;gap:18px;padding:12px 0 4px;width:100%;}
-.range__track{position:relative;height:12px;}
+.range__track{position:relative;height:12px;touch-action:none;}
 .range__track::before{content:'';position:absolute;left:0;right:0;top:5.5px;height:1px;background:var(--sand-700);}
+/* the chosen span of the rail darkens — same hairline, Sand 1000 */
+.range__fill{position:absolute;top:5.5px;height:1px;background:var(--sand-1000);}
 .range__track i{
-  position:absolute;top:0;width:12px;height:12px;border-radius:999px;
-  background:var(--white);border:1px solid var(--sand-700);
+  position:absolute;top:0;left:0;width:12px;height:12px;border-radius:999px;
+  background:var(--white);border:1px solid var(--sand-700);cursor:grab;
+  transition:border-color .2s ease,transform .2s ease;
 }
-.range__track i:first-of-type{left:0;} .range__track i:last-of-type{right:0;}
+.range__track i:hover,.range__track i:focus-visible{border-color:var(--sand-1000);outline:none;}
+.range__track i.drag{cursor:grabbing;border-color:var(--sand-1000);transform:scale(1.15);}
 .range__in{display:flex;gap:12px;}
 .range__in input{
   flex:1;min-width:0;height:44px;padding:0 20px;border-radius:999px;
@@ -1018,9 +1024,12 @@ document.getElementById('facets').innerHTML = FACETS.map(function(f){
   let body;
   if(f.range){
     body = '<div class="range">'
-      + '<div class="range__track"><i></i><i></i></div>'
-      + '<div class="range__in"><input type="text" value="AED 0" aria-label="Minimum price">'
-      + '<input type="text" value="AED 4,50,000" aria-label="Maximum price"></div></div>';
+      + '<div class="range__track"><span class="range__fill"></span>'
+      + '<i class="range__h" role="slider" tabindex="0" aria-label="Minimum price"></i>'
+      + '<i class="range__h" role="slider" tabindex="0" aria-label="Maximum price"></i></div>'
+      + '<div class="range__in">'
+      + '<input type="text" class="range__lo" inputmode="numeric" aria-label="Minimum price">'
+      + '<input type="text" class="range__hi" inputmode="numeric" aria-label="Maximum price"></div></div>';
   } else {
     body = f.opts.map(function(o){
       return '<button class="opt'+(o.on?' on':'')+(o.off?' off':'')+'" type="button"'
@@ -1035,9 +1044,102 @@ document.getElementById('facets').innerHTML = FACETS.map(function(f){
     + '<div class="fgroup__body">'+body+'</div></div>';
 }).join('');
 
+/* ------------------------------------------------------------
+   Price range — two draggable handles over one rail.
+   Drag, click the rail, arrow keys, or type into either field;
+   the four stay in sync and the handles can't cross.
+   ------------------------------------------------------------ */
+const P_MIN = 0, P_MAX = 450000, P_STEP = 5000;
+const price = [P_MIN, P_MAX];
+let paintRange = function(){}, resetRange = function(){};
+
+function aed(n){ return 'AED ' + n.toLocaleString('en-IN'); }
+
+(function wireRange(){
+  const track = document.querySelector('.range__track');
+  if(!track) return;
+  const fill = track.querySelector('.range__fill');
+  const hs   = track.querySelectorAll('.range__h');
+  const lo   = document.querySelector('.range__lo');
+  const hi   = document.querySelector('.range__hi');
+  const SPAN = P_MAX - P_MIN;
+
+  paintRange = function(){
+    const travel = track.clientWidth - 12;   /* handle centres run between the two ends */
+    hs.forEach(function(h, i){
+      const pct = (price[i] - P_MIN) / SPAN;
+      h.style.left = (pct * travel) + 'px';
+      h.setAttribute('aria-valuemin', i ? price[0] : P_MIN);
+      h.setAttribute('aria-valuemax', i ? P_MAX : price[1]);
+      h.setAttribute('aria-valuenow', price[i]);
+      h.setAttribute('aria-valuetext', aed(price[i]));
+    });
+    fill.style.left  = ((price[0] - P_MIN) / SPAN * travel + 6) + 'px';
+    fill.style.right = ((P_MAX - price[1]) / SPAN * travel + 6) + 'px';
+    lo.value = aed(price[0]);
+    hi.value = aed(price[1]);
+  };
+
+  resetRange = function(){ price[0] = P_MIN; price[1] = P_MAX; paintRange(); };
+
+  function setVal(i, v){
+    if(isNaN(v)) return;
+    v = Math.round(Math.min(P_MAX, Math.max(P_MIN, v)) / P_STEP) * P_STEP;
+    price[i] = i === 0 ? Math.min(v, price[1]) : Math.max(v, price[0]);
+    paintRange();
+  }
+  function fromX(x){
+    const r = track.getBoundingClientRect();
+    return P_MIN + (x - r.left - 6) / (r.width - 12) * SPAN;
+  }
+
+  hs.forEach(function(h, i){
+    h.addEventListener('pointerdown', function(e){
+      e.preventDefault(); h.setPointerCapture(e.pointerId); h.classList.add('drag');
+    });
+    h.addEventListener('pointermove', function(e){
+      if(h.classList.contains('drag')) setVal(i, fromX(e.clientX));
+    });
+    h.addEventListener('pointerup', function(e){
+      h.classList.remove('drag'); h.releasePointerCapture(e.pointerId);
+    });
+    h.addEventListener('keydown', function(e){
+      let v = null;
+      if(e.key === 'ArrowLeft'  || e.key === 'ArrowDown') v = price[i] - P_STEP;
+      if(e.key === 'ArrowRight' || e.key === 'ArrowUp')   v = price[i] + P_STEP;
+      if(e.key === 'Home') v = P_MIN;
+      if(e.key === 'End')  v = P_MAX;
+      if(v === null) return;
+      e.preventDefault(); setVal(i, v);
+    });
+  });
+
+  /* a click on the rail sends the nearer handle there */
+  track.addEventListener('pointerdown', function(e){
+    if(e.target.classList.contains('range__h')) return;
+    const v = fromX(e.clientX);
+    setVal(Math.abs(v - price[0]) <= Math.abs(v - price[1]) ? 0 : 1, v);
+  });
+
+  /* the fields strip their formatting while being edited, and take it back on the way out */
+  [lo, hi].forEach(function(input, i){
+    input.addEventListener('focus', function(){ input.value = String(price[i]); input.select(); });
+    input.addEventListener('blur',  function(){
+      const n = parseInt(input.value.replace(/[^\d]/g, ''), 10);
+      setVal(i, isNaN(n) ? price[i] : n);
+    });
+    input.addEventListener('keydown', function(e){ if(e.key === 'Enter') input.blur(); });
+  });
+
+  window.addEventListener('resize', paintRange);
+  paintRange();
+})();
+
 document.getElementById('facets').addEventListener('click', function(e){
   const head = e.target.closest('.fgroup__head');
-  if(head){ head.parentElement.classList.toggle('shut'); return; }
+  /* reopening a collapsed group gives the rail its width back — repaint so the
+     handles land in the right place */
+  if(head){ head.parentElement.classList.toggle('shut'); paintRange(); return; }
   const opt = e.target.closest('.opt');
   if(opt) opt.setAttribute('aria-pressed', opt.classList.toggle('on') ? 'true' : 'false');
 });
@@ -1046,6 +1148,7 @@ document.getElementById('clearAll').addEventListener('click', function(){
     o.classList.remove('on');
     o.setAttribute('aria-pressed','false');
   });
+  resetRange();
 });
 
 const drawer = document.getElementById('drawer');
@@ -1056,7 +1159,7 @@ function setDrawer(open){
   scrim.classList.toggle('on', open);
   filterBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   document.body.style.overflow = open ? 'hidden' : '';
-  if(open) document.getElementById('drawerClose').focus();
+  if(open){ paintRange(); document.getElementById('drawerClose').focus(); }
 }
 filterBtn.addEventListener('click', function(){ setDrawer(true); });
 document.getElementById('mFilterBtn').addEventListener('click', function(){ setDrawer(true); });
