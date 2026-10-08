@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wireframe — Store Detail Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   WIREFRAME SYSTEM — same greys / Inter scale as the listing page
+   ============================================================ */
+:root{
+  --bg:#f0f0f0; --white:#ffffff; --e6:#e6e6e6;
+  --ink:#000000; --txt-2:#545454; --txt-3:#8a8a8a;
+  --line:#b4b4b4; --line-2:#d9d9d9; --line-3:#c5c5c5;
+  --ph:#d9d9d9; --ph-2:#c7c7c7;
+  --ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+
+  --gut:24px;
+  --hdr:80px;
+  --peek:240px;   /* how much of the next gallery slide shows */
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;overflow-x:clip;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--ui);font-weight:400;font-size:12px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:clip;
+  padding-top:var(--hdr);
+}
+img{display:block;max-width:100%;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+p{margin:0;}
+h1,h2,h3{margin:0;font-weight:400;line-height:1.6;}
+
+.h3{font-size:32px;line-height:1.6;}
+.h5{font-size:24px;line-height:1.6;}
+.h6{font-size:20px;line-height:1.6;}
+.h7{font-size:16px;line-height:1.6;}
+.s3{font-size:12px;line-height:1.6;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.s4{font-size:10px;line-height:1.6;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.b2{font-size:14px;line-height:1.6;}
+.b3{font-size:12px;line-height:1.6;}
+.b4{font-size:10px;line-height:1.6;}
+.muted{color:var(--txt-2);}
+
+/* rails: native horizontal scroll + snap, scrollbar hidden */
+.rail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;
+  touch-action:pan-x pan-y;overscroll-behavior-x:contain;}
+.rail::-webkit-scrollbar{display:none;}
+
+/* 32px circular arrow pair, used by the gallery and the reviews rail */
+.arrows{display:flex;gap:10px;}
+.arrows button{
+  width:32px;height:32px;border-radius:999px;background:var(--white);
+  border:1px solid var(--line-2);
+  display:grid;place-items:center;transition:border-color .2s ease,opacity .2s ease;
+}
+.arrows button:hover{border-color:var(--txt-3);}
+.arrows button[disabled]{opacity:.35;cursor:default;}
+.arrows svg{width:16px;height:16px;}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.hdr{
+  position:fixed;inset:0 0 auto 0;z-index:60;height:var(--hdr);
+  background:var(--bg);border-bottom:1px solid var(--line-2);padding:16px var(--gut);
+}
+.hdr__wrap{position:relative;height:48px;display:flex;align-items:center;justify-content:space-between;}
+.hdr__nav,.hdr__util{display:flex;align-items:center;gap:32px;font-size:12px;}
+.hdr__nav a:hover,.hdr__util a:hover{text-decoration:underline;text-underline-offset:3px;}
+.hdr__logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:64px;height:40px;display:grid;place-items:center;}
+.hdr__logo img{width:100%;height:100%;object-fit:contain;}
+.hdr__burger{display:none;width:24px;height:24px;position:relative;}
+.hdr__burger::before,.hdr__burger::after,.hdr__burger i{
+  content:'';position:absolute;left:2px;right:2px;height:1px;background:var(--ink);}
+.hdr__burger::before{top:7px;} .hdr__burger i{top:12px;} .hdr__burger::after{top:17px;}
+
+/* ============================================================
+   1 — Breadcrumbs (centred, per the wireframe)
+   ============================================================ */
+.crumbs{padding:24px var(--gut);display:flex;justify-content:center;}
+.crumbs span{color:var(--txt-2);}
+.crumbs a:hover{text-decoration:underline;text-underline-offset:3px;}
+.crumbs b{font-weight:400;color:var(--ink);}
+
+/* ============================================================
+   2 — Gallery: 1200px slides, 24px gutter, next slide peeking
+   ============================================================ */
+.sgal{position:relative;height:520px;}
+/* scroll-padding keeps the snap from eating the left gutter */
+.sgal__rail{height:100%;gap:24px;padding:0 var(--gut);scroll-padding-left:var(--gut);}
+.sgal__slide{
+  flex:0 0 calc(100vw - var(--peek));height:100%;background:var(--ph);
+  scroll-snap-align:start;
+}
+.sgal__slide:nth-child(even){background:var(--ph-2);}
+
+/* floating detail card — 400x206, white, r8, 24px padding */
+.sgal__card{
+  position:absolute;left:calc(var(--gut) + 24px);bottom:24px;z-index:3;
+  width:400px;background:var(--white);border-radius:8px;padding:24px;
+  display:flex;flex-direction:column;gap:12px;pointer-events:none;
+}
+.sgal__tag{
+  align-self:flex-start;display:inline-flex;align-items:center;height:20px;padding:4px 8px;
+  border-radius:999px;border:1px solid var(--txt-3);
+  font-size:10px;font-weight:500;line-height:1;letter-spacing:.05em;text-transform:uppercase;
+}
+.sgal__arrows{position:absolute;right:var(--peek);bottom:24px;z-index:3;}
+
+/* ============================================================
+   3 — Details: 300px info column + map
+   ============================================================ */
+.sdet{padding:48px var(--gut);display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start;}
+.sdet__info{height:520px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;}
+.sdet__rows{display:flex;flex-direction:column;gap:24px;}
+.sdet__row{display:flex;gap:16px;align-items:flex-start;}
+.sdet__row .dot{width:24px;height:24px;border-radius:999px;background:var(--ph);flex:none;}
+.sdet__svc{display:flex;flex-direction:column;gap:12px;}
+.sdet__tag{display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.sdet__tag svg{width:16px;height:16px;flex:none;}
+/* live Google embed, desaturated so it reads as wireframe rather than product.
+   The grey label underneath is what shows if the embed is blocked or offline. */
+.sdet__map{position:relative;height:520px;background:var(--ph-2);overflow:hidden;}
+.sdet__map-ph{position:absolute;inset:0;display:grid;place-items:center;
+  font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#8f8f8f;}
+.sdet__map iframe{
+  position:relative;display:block;width:100%;height:100%;border:0;
+  filter:grayscale(1) contrast(1.05) brightness(1.02);
+}
+
+/* ============================================================
+   4 — Google reviews
+   ============================================================ */
+.srev{padding:64px var(--gut);display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:start;}
+.srev__left{height:400px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;}
+.srev__sum{display:flex;flex-direction:column;gap:12px;}
+.srev__score{font-size:32px;line-height:1.2;}
+.stars{display:flex;gap:2px;font-size:14px;line-height:1;letter-spacing:1px;}
+.stars i{font-style:normal;color:var(--ink);}
+.stars i.off{color:var(--ph-2);}
+.srev__rail{gap:24px;padding-bottom:4px;}
+.rcard{
+  flex:0 0 300px;height:400px;background:var(--white);border-radius:24px;padding:24px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:16px;
+  scroll-snap-align:start;
+}
+.rcard__body{flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center;}
+.rcard__meta{display:flex;flex-direction:column;gap:2px;}
+.rcard__meta b{font-weight:500;font-size:12px;}
+.rcard__meta span{font-size:10px;color:var(--txt-2);}
+
+/* ============================================================
+   5 — Products available in store
+   ============================================================ */
+.sprod{background:var(--white);padding:64px 0;display:flex;flex-direction:column;gap:32px;}
+.sprod__head{padding:0 var(--gut);text-align:center;}
+.sprod__rail{gap:24px;padding:0 56px;scroll-padding-left:56px;}
+.pcard{flex:0 0 314px;display:flex;flex-direction:column;gap:24px;padding-bottom:24px;scroll-snap-align:start;}
+.pcard__img{height:330px;background:var(--bg);display:grid;place-items:center;}
+.pcard__img svg{width:90px;height:108px;}
+.pcard__info{padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.pcard__name{font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.pcard__price{font-size:12px;color:var(--txt-2);}
+
+/* ============================================================
+   6 — FAQ band
+   ============================================================ */
+/* Both inner blocks are 450 wide. The frame centred the left one inside a 656
+   column and left the right one flush at its padding, which put the section
+   56px left of page centre — balanced here instead: equal 120px gutters. */
+.sfaq{background:var(--e6);padding:120px;display:flex;justify-content:space-between;gap:48px;}
+.sfaq__left{display:flex;}
+.sfaq__form{
+  width:450px;min-height:380px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:32px;
+}
+.sfaq__left .dot{width:48px;height:48px;border-radius:999px;background:var(--ph);}
+.sfaq__intro{display:flex;flex-direction:column;gap:32px;}
+.sfaq__note{max-width:350px;color:var(--txt-2);}
+.faqs{width:450px;display:flex;flex-direction:column;}
+/* each accordion is 60px header + its own 16px gap = the file's 76px pitch */
+.faq{padding-bottom:16px;}
+.faq__q{
+  width:100%;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  text-align:left;font-size:14px;line-height:1.6;transition:opacity .2s ease;
+  border-bottom:1px dashed var(--txt-3);
+}
+.faq__q:hover{opacity:.6;}
+.faq__sign{position:relative;width:16px;height:16px;flex:none;}
+.faq__sign::before,.faq__sign::after{content:'';position:absolute;background:var(--ink);
+  transition:transform .25s ease,opacity .25s ease;}
+.faq__sign::before{left:0;top:7.5px;width:16px;height:1px;}
+.faq__sign::after{top:0;left:7.5px;width:1px;height:16px;}
+.faq.open .faq__sign::after{transform:scaleY(0);opacity:0;}
+.faq__a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.faq__a p{padding:16px 32px 0 0;color:var(--txt-2);}
+
+/* ============================================================
+   7 — Concierge
+   ============================================================ */
+.scon{background:var(--bg);padding:80px var(--gut);
+  display:flex;flex-direction:column;align-items:center;gap:48px;}
+.scon__top{max-width:686px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.scon__row{display:flex;align-items:stretch;gap:0;}
+.scon__cta{width:310px;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center;}
+.scon__cta .dot{width:48px;height:48px;border-radius:999px;background:var(--ph);}
+.scon__head{display:flex;flex-direction:column;gap:8px;}
+.scon__div{width:1px;background:var(--line);margin:0 160px;}
+.btn-fill{height:34px;background:var(--txt-2);color:var(--white);
+  display:inline-flex;align-items:center;justify-content:center;padding:0 20px;
+  font-size:10px;letter-spacing:.05em;text-transform:uppercase;transition:background-color .2s ease;}
+.btn-fill:hover{background:var(--ink);}
+.btn-line{height:34px;border:1px solid var(--line);color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;padding:0 20px;
+  font-size:10px;letter-spacing:.05em;text-transform:uppercase;transition:border-color .2s ease;}
+.btn-line:hover{border-color:var(--ink);}
+
+/* ============================================================
+   8 — Footer
+   ============================================================ */
+.foot{background:var(--bg);border-top:1px solid var(--line-3);}
+.foot__main{display:grid;grid-template-columns:300px 1fr 300px;gap:48px;padding:80px 120px;}
+.foot__brand{display:flex;flex-direction:column;gap:24px;}
+.foot__brand img{width:72px;height:auto;}
+.foot__brand p{font-size:12px;line-height:1.6;color:var(--txt-2);max-width:280px;}
+.foot__cols{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.foot__col h3{font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--txt-3);margin-bottom:16px;}
+.foot__col a{display:block;font-size:12px;line-height:2;width:max-content;}
+.foot__col a:hover{text-decoration:underline;text-underline-offset:3px;}
+.foot__news h3{font-size:12px;font-weight:400;margin-bottom:16px;}
+.foot__news form{display:flex;flex-direction:column;gap:12px;}
+.foot__news input{height:44px;border:1px solid var(--line);background:var(--white);
+  padding:0 16px;font-family:var(--ui);font-size:12px;border-radius:0;}
+.foot__news input::placeholder{color:var(--txt-3);}
+.foot__news input:focus{outline:none;border-color:var(--txt-3);}
+.foot__news .btn-fill{height:44px;font-size:12px;letter-spacing:0;text-transform:none;}
+.foot__div{height:1px;background:#e0ddd8;}
+.foot__bar{background:var(--white);padding:20px 120px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.foot__c{font-size:12px;color:var(--txt-2);}
+.foot__pay{display:flex;gap:8px;flex-wrap:wrap;}
+.foot__pay span{font-size:10px;color:var(--txt-2);padding:4px 8px;border:1px solid var(--line);border-radius:4px;}
+
+/* dots are a mobile-only affordance, switched on in the query below */
+.sgal__dots{display:none;justify-content:center;gap:6px;padding:12px 0 0;}
+.sgal__dots i{width:6px;height:6px;border-radius:999px;background:var(--ph-2);display:block;
+  transition:background-color .2s ease;}
+.sgal__dots i.on{background:var(--txt-2);}
+
+/* ============================================================
+   MOBILE — no wireframe existed for this page, so it is worked
+   out here: everything that was a peeking rail stays a rail,
+   everything side-by-side stacks, the gallery card drops under
+   the image rather than floating over it.
+   ============================================================ */
+@media (max-width:767px){
+  :root{--hdr:64px;--peek:48px;}
+  .hdr{padding:12px var(--gut);}
+  .hdr__wrap{height:40px;}
+  .hdr__nav,.hdr__util{display:none;}
+  .hdr__burger{display:block;}
+  .hdr__util--m{display:flex;align-items:center;gap:20px;font-size:12px;}
+
+  .crumbs{padding:16px var(--gut);justify-content:flex-start;overflow-x:auto;white-space:nowrap;
+    scrollbar-width:none;}
+  .crumbs::-webkit-scrollbar{display:none;}
+
+  /* gallery: swipe only, card underneath, arrows and peek dropped */
+  .sgal{height:auto;}
+  .sgal__rail{height:300px;gap:12px;}
+  .sgal__slide{flex:0 0 calc(100vw - 48px);}
+  .sgal__card{position:static;width:auto;margin:16px var(--gut) 0;pointer-events:auto;}
+  .sgal__arrows{display:none;}
+  .sgal__dots{display:flex;}
+
+  .sdet{grid-template-columns:1fr;gap:32px;padding:40px var(--gut);}
+  .sdet__info{height:auto;gap:32px;}
+  .sdet__map{height:240px;order:2;}
+
+  .srev{grid-template-columns:1fr;gap:24px;padding:48px 0;}
+  .srev__left{height:auto;padding:0 var(--gut);flex-direction:row;align-items:flex-end;
+    justify-content:space-between;gap:16px;}
+  .srev__rail{gap:16px;padding:0 var(--gut);scroll-padding-left:var(--gut);}
+  .rcard{flex:0 0 280px;height:340px;border-radius:16px;}
+
+  .sprod{padding:48px 0;gap:24px;}
+  .sprod__rail{gap:16px;padding:0 var(--gut);scroll-padding-left:var(--gut);}
+  .pcard{flex:0 0 240px;gap:16px;}
+  .pcard__img{height:260px;}
+  .pcard__img svg{width:70px;height:84px;}
+  .pcard__info{padding:0;}
+  .pcard__name{font-size:10px;}
+  .pcard__price{font-size:10px;}
+
+  .sfaq{flex-direction:column;padding:48px var(--gut);gap:32px;}
+  .sfaq__form{width:100%;min-height:0;gap:24px;}
+  .sfaq__intro{gap:24px;}
+  .sfaq__note{max-width:none;}
+  .faqs{width:100%;}
+
+  .scon{padding:48px var(--gut);gap:32px;}
+  .scon__row{flex-direction:column;width:100%;gap:32px;}
+  .scon__cta{width:100%;}
+  .scon__div{width:100%;height:1px;margin:0;}
+
+  .foot__main{grid-template-columns:1fr;gap:40px;padding:48px 24px;}
+  .foot__cols{grid-template-columns:1fr 1fr;gap:32px 16px;}
+  .foot__bar{flex-direction:column;align-items:flex-start;gap:16px;padding:20px 24px 32px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="hdr">
+  <div class="hdr__wrap">
+    <nav class="hdr__nav">
+      <a href="#">Shop All</a><a href="#">Gold</a><a href="#">Polki</a>
+      <a href="#">Diamond</a><a href="#">Gemstones</a><a href="#">Heritage</a>
+    </nav>
+    <button class="hdr__burger" aria-label="Menu"><i></i></button>
+    <a class="hdr__logo" href="#" aria-label="Jaipur Gems"><img src="assets/logo-dark.svg" alt="Jaipur Gems"></a>
+    <div class="hdr__util">
+      <a href="#">Visit Us</a><a href="#">Search</a><a href="#">Account</a><a href="#">Cart (0)</a>
+    </div>
+    <div class="hdr__util hdr__util--m" style="display:none">
+      <a href="#">Search</a><a href="#">Cart (0)</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 1 · BREADCRUMBS ================= -->
+<nav class="crumbs b3">
+  <span><a href="#">Home</a> &nbsp;&gt;&nbsp; <a href="jg-wireframe-store-listing.html">Stores</a> &nbsp;&gt;&nbsp; <b>Turner Road Mumbai</b></span>
+</nav>
+
+<!-- ================= 2 · GALLERY ================= -->
+<section class="sgal">
+  <div class="rail sgal__rail" id="galRail">
+    <div class="sgal__slide"></div>
+    <div class="sgal__slide"></div>
+    <div class="sgal__slide"></div>
+  </div>
+
+  <div class="sgal__card">
+    <span class="sgal__tag">Mumbai</span>
+    <h1 class="h5">Jaipur Gems - Turner Road</h1>
+    <p class="b3 muted">Our Bandra boutique sits just off the Turner Road junction, behind a quiet entrance. Everyday gold and diamonds on the ground floor; private rooms upstairs for bridal and high jewellery, where pieces are brought up one at a time.</p>
+  </div>
+
+  <div class="arrows sgal__arrows" id="galArrows">
+    <button data-dir="-1" aria-label="Previous">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M10 3 5 8l5 5" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button data-dir="1" aria-label="Next">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="sgal__dots" id="galDots"><i class="on"></i><i></i><i></i></div>
+</section>
+
+<!-- ================= 3 · DETAILS ================= -->
+<section class="sdet">
+  <div class="sdet__info">
+    <div class="sdet__rows">
+      <div class="sdet__row"><span class="dot"></span>
+        <p class="b3">Turner Road, Bandra West,<br>Mumbai 400050, India</p></div>
+      <div class="sdet__row"><span class="dot"></span>
+        <p class="b3">+91 81080 41000</p></div>
+      <div class="sdet__row"><span class="dot"></span>
+        <p class="b3">Open 11:00 AM – 8:00 PM,<br>Mon – Sun</p></div>
+    </div>
+
+    <div class="sdet__svc" id="svcList"></div>
+  </div>
+
+  <div class="sdet__map">
+    <span class="sdet__map-ph">Google Map</span>
+    <iframe
+      src="https://maps.google.com/maps?q=Jaipur%20Gems%2C%20Turner%20Road%2C%20Bandra%20West%2C%20Mumbai%20400050&z=16&output=embed"
+      title="Map — Jaipur Gems, Turner Road, Bandra West, Mumbai"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+
+<!-- ================= 4 · GOOGLE REVIEWS ================= -->
+<!-- placeholder content: no Google listing was found for this boutique,
+     so the score, count and all four reviews are dummy copy -->
+<section class="srev">
+  <div class="srev__left">
+    <div class="srev__sum">
+      <span class="srev__score">4.8</span>
+      <span class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span>
+      <span class="b3 muted">Based on 186 Google reviews</span>
+    </div>
+    <div class="arrows" id="revArrows">
+      <button data-dir="-1" aria-label="Previous">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M10 3 5 8l5 5" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button data-dir="1" aria-label="Next">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="rail srev__rail" id="revRail"></div>
+</section>
+
+<!-- ================= 5 · PRODUCTS AVAILABLE IN STORE ================= -->
+<section class="sprod">
+  <div class="sprod__head"><h2 class="h6">Products Available in Store</h2></div>
+  <div class="rail sprod__rail" id="prodRail"></div>
+</section>
+
+<!-- ================= 6 · FAQ ================= -->
+<section class="sfaq">
+  <div class="sfaq__left">
+    <div class="sfaq__form">
+      <div class="sfaq__intro">
+        <span class="dot"></span>
+        <h2 class="h6">General Questions Asked<br>by Our Customers</h2>
+      </div>
+      <p class="b2 sfaq__note">Our team of advisors is always here to help you with quick, clear and reliable answers whenever needed.</p>
+    </div>
+  </div>
+
+  <div class="sfaq__right">
+    <div class="faqs" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ================= 7 · CONCIERGE ================= -->
+<section class="scon">
+  <div class="scon__top">
+    <span class="s3">Looking for the right design?</span>
+    <h2 class="h5">Lets start with a conversation</h2>
+    <p class="b3 muted">Whether you&rsquo;re visiting us in Abu Dhabi or Dubai, or reaching out from anywhere in the world &mdash; our advisors are here to guide you.</p>
+  </div>
+
+  <div class="scon__row">
+    <div class="scon__cta">
+      <span class="dot"></span>
+      <div class="scon__head">
+        <h3 class="h6">Book a Store Visit</h3>
+        <p class="b3 muted">Step into our boutique for an unhurried, private consultation.</p>
+      </div>
+      <a class="btn-fill" href="#">Reserve Your Visit</a>
+    </div>
+
+    <div class="scon__div"></div>
+
+    <div class="scon__cta">
+      <span class="dot"></span>
+      <div class="scon__head">
+        <h3 class="h6">Speak to an Advisor</h3>
+        <p class="b3 muted">Connect with a Jaipur Gems advisor via WhatsApp &mdash; wherever you are.</p>
+      </div>
+      <a class="btn-line" href="#">Start a Conversation</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8 · FOOTER ================= -->
+<footer class="foot">
+  <div class="foot__main">
+    <div class="foot__brand">
+      <img src="assets/logo-dark.svg" alt="Jaipur Gems">
+      <p>Rooted in India&rsquo;s finest artisanal traditions, Jaipur Gems has been designing and crafting jewellery by hand since 1974 &mdash; pieces made not for a season, but for a lifetime.</p>
+    </div>
+
+    <nav class="foot__cols">
+      <div class="foot__col">
+        <h3>Shop</h3>
+        <a href="#">Gold</a><a href="#">Polki</a><a href="#">Diamond</a><a href="#">Gemstone</a><a href="#">Shop All</a>
+      </div>
+      <div class="foot__col">
+        <h3>About</h3>
+        <a href="#">Our Story</a><a href="#">Journal</a><a href="#">Contact Us</a><a href="jg-wireframe-store-listing.html">Stores</a>
+      </div>
+      <div class="foot__col">
+        <h3>Socials</h3>
+        <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">X</a><a href="#">Pinterest</a>
+      </div>
+      <div class="foot__col">
+        <h3>Legal</h3>
+        <a href="#">Privacy Policy</a><a href="#">Refund Policy</a><a href="#">Terms of Service</a>
+      </div>
+    </nav>
+
+    <div class="foot__news">
+      <h3>Subscribe to Our Newsletter</h3>
+      <form onsubmit="return false">
+        <input type="email" placeholder="Your e-mail" aria-label="Your e-mail">
+        <button class="btn-fill" type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="foot__div"></div>
+
+  <div class="foot__bar">
+    <span class="foot__c">&copy; 2026 Jaipur Gems</span>
+    <span class="foot__pay">
+      <span>Visa</span><span>Mastercard</span><span>Amex</span><span>PayPal</span><span>Diners</span><span>Discover</span>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   0 — small helpers
+   ============================================================ */
+var CHECK = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
+  + '<circle cx="8" cy="8" r="6.25" stroke="#545454" stroke-width="1"/>'
+  + '<path d="M5.4 8.2 7.1 9.9l3.5-3.6" stroke="#545454" stroke-width="1" '
+  + 'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function stars(n){
+  var s = '';
+  for (var i = 1; i <= 5; i++) s += '<i' + (i > n ? ' class="off"' : '') + '>★</i>';
+  return '<span class="stars">' + s + '</span>';
+}
+
+/* a rail steps by one card + gap; arrows disable at the ends */
+function wireRail(rail, arrowBox){
+  function step(){
+    var first = rail.firstElementChild;
+    if (!first) return 0;
+    var gap = parseFloat(getComputedStyle(rail).columnGap || getComputedStyle(rail).gap) || 0;
+    return first.getBoundingClientRect().width + gap;
+  }
+  function sync(){
+    if (!arrowBox) return;
+    var btns = arrowBox.querySelectorAll('button');
+    btns[0].disabled = rail.scrollLeft <= 2;
+    btns[1].disabled = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2;
+  }
+  if (arrowBox){
+    arrowBox.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        rail.scrollBy({ left: step() * parseInt(b.dataset.dir, 10), behavior:'smooth' });
+      });
+    });
+  }
+  rail.addEventListener('scroll', sync, { passive:true });
+  window.addEventListener('resize', sync);
+  sync();
+  return { sync: sync, step: step };
+}
+
+/* ============================================================
+   1 — services on the detail column
+   ============================================================ */
+var SERVICES = ['Private Viewings','High Jewellery','Bespoke Commissions'];
+document.getElementById('svcList').innerHTML = SERVICES.map(function(t){
+  return '<span class="sdet__tag">' + CHECK + t + '</span>';
+}).join('');
+
+/* ============================================================
+   2 — gallery rail: arrows on desktop, swipe + dots on mobile
+   ============================================================ */
+var galRail = document.getElementById('galRail');
+var galDots = document.getElementById('galDots');
+wireRail(galRail, document.getElementById('galArrows'));
+
+galRail.addEventListener('scroll', function(){
+  var step = galRail.firstElementChild.getBoundingClientRect().width
+           + (parseFloat(getComputedStyle(galRail).columnGap) || 0);
+  var i = Math.round(galRail.scrollLeft / step);
+  galDots.querySelectorAll('i').forEach(function(d, n){ d.classList.toggle('on', n === i); });
+}, { passive:true });
+
+/* ============================================================
+   3 — reviews (placeholder copy — not pulled from Google)
+   ============================================================ */
+var REVIEWS = [
+  { n:5, t:'Bought my wedding set here. They let us take our time over it and nothing felt rushed. The polki work is exactly what we had been looking for.', who:'Ananya R.', when:'2 weeks ago' },
+  { n:5, t:'The advisor explained the difference between polki and other settings properly, without pushing anything. Rare to find.', who:'Rohit M.', when:'a month ago' },
+  { n:4, t:'Beautiful pieces and a calm room to see them in. Took a while to get an appointment but it was worth the wait.', who:'Priya S.', when:'2 months ago' },
+  { n:5, t:'Third generation of my family buying from them. The craftsmanship has not slipped in all that time.', who:'Vikram D.', when:'3 months ago' },
+  { n:5, t:'Had a necklace reset for my mother. They kept us updated the whole way through and the finish is immaculate.', who:'Sneha K.', when:'4 months ago' }
+];
+document.getElementById('revRail').innerHTML = REVIEWS.map(function(r){
+  return '<article class="rcard">'
+    + stars(r.n)
+    + '<div class="rcard__body"><p class="b3">' + r.t + '</p></div>'
+    + '<div class="rcard__meta"><b>' + r.who + '</b><span>' + r.when + '</span></div>'
+    + '</article>';
+}).join('');
+wireRail(document.getElementById('revRail'), document.getElementById('revArrows'));
+
+/* ============================================================
+   4 — products available in store
+   ============================================================ */
+var RING = '<svg viewBox="0 0 90 108" fill="#d9d9d9" aria-hidden="true">'
+  + '<path d="M36 0h18v10H36z"/>'
+  + '<path d="M45 6 59 22H31L45 6z"/>'
+  + '<path d="M45 24a42 42 0 1 0 0 84 42 42 0 0 0 0-84zm0 18a24 24 0 1 1 0 48 24 24 0 0 1 0-48z"/>'
+  + '</svg>';
+
+var PRODUCTS = [
+  { name:'Aqua Dreams', price:'Price On Request' },
+  { name:'Aqua Dreams', price:'Price On Request' },
+  { name:'Aqua Dreams', price:'Price On Request' },
+  { name:'Aqua Dreams', price:'Price On Request' },
+  { name:'Aqua Dreams', price:'Price On Request' }
+];
+document.getElementById('prodRail').innerHTML = PRODUCTS.map(function(p){
+  return '<a class="pcard" href="#">'
+    + '<span class="pcard__img">' + RING + '</span>'
+    + '<span class="pcard__info">'
+    +   '<span class="pcard__name">' + p.name + '</span>'
+    +   '<span class="pcard__price">' + p.price + '</span>'
+    + '</span></a>';
+}).join('');
+wireRail(document.getElementById('prodRail'), null);
+
+/* ============================================================
+   5 — store FAQs
+   ============================================================ */
+var FAQS = [
+  { q:'Do I need an appointment?',
+    a:'Walk-ins are welcome through opening hours. Booking simply means an advisor is expecting you and the pieces you want to see are ready when you arrive.' },
+  { q:'What is kept at this boutique?',
+    a:'This room carries high jewellery, bridal Jadau and bespoke commissions. Anything held at another boutique or at our atelier can be brought in with a few days’ notice.' },
+  { q:'How long does a private viewing take?',
+    a:'An hour is typical. Bridal and high jewellery appointments often run longer, and we never rush a table. Tell us the occasion and we will plan the time accordingly.' },
+  { q:'Why do some pieces show price on request?',
+    a:'High jewellery and one-of-a-kind pieces are priced by their stones, so no two are alike. Your advisor will share the price in person or over WhatsApp.' },
+  { q:'Is there parking at the boutique?',
+    a:'[Placeholder — parking and access details to be confirmed with the store team.]' }
+];
+
+var faqList = document.getElementById('faqList');
+faqList.innerHTML = FAQS.map(function(f){
+  return '<div class="faq">'
+    + '<button class="faq__q" type="button">' + f.q + '<span class="faq__sign"></span></button>'
+    + '<div class="faq__a"><p class="b3">' + f.a + '</p></div>'
+    + '</div>';
+}).join('');
+
+faqList.querySelectorAll('.faq__q').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var item = btn.parentNode;
+    var panel = item.querySelector('.faq__a');
+    var open = item.classList.contains('open');
+
+    faqList.querySelectorAll('.faq').forEach(function(f){
+      f.classList.remove('open');
+      f.querySelector('.faq__a').style.maxHeight = '0px';
+    });
+
+    if (!open){
+      item.classList.add('open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    }
+  });
+});
+
+/* ============================================================
+   6 — mobile utility nav
+   ============================================================ */
+function syncNav(){
+  var m = window.matchMedia('(max-width:767px)').matches;
+  document.querySelector('.hdr__util--m').style.display = m ? 'flex' : 'none';
+}
+window.addEventListener('resize', syncNav);
+syncNav();
+</script>
+</body>
+</html>

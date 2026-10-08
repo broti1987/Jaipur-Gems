@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wireframe — Store Listing Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   WIREFRAME SYSTEM — taken from the Figma wireframe file
+   greys, Inter, no brand colour, no photography
+   ============================================================ */
+:root{
+  --bg:#f0f0f0;         /* page + section fill */
+  --white:#ffffff;      /* cards, bottom bar */
+  --e6:#e6e6e6;         /* FAQ band */
+  --ink:#000000;
+  --txt-2:#545454;      /* body / secondary */
+  --txt-3:#8a8a8a;      /* tertiary, tag outlines */
+  --line:#b4b4b4;       /* card + control stroke */
+  --line-2:#d9d9d9;     /* header rule */
+  --line-3:#c5c5c5;     /* footer rule */
+  --ph:#d9d9d9;         /* image placeholder (small) */
+  --ph-2:#c7c7c7;       /* image placeholder (large) */
+  --ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+
+  --gut:24px;           /* wireframe page gutter */
+  --hdr:80px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;overflow-x:clip;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--ui);font-weight:400;font-size:12px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:clip;
+  padding-top:var(--hdr);
+}
+img{display:block;max-width:100%;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+p{margin:0;}
+h1,h2,h3{margin:0;font-weight:400;line-height:1.6;}
+
+/* ---- text styles, 1:1 with the file's local styles ---- */
+.h5{font-size:24px;line-height:1.6;font-weight:400;}
+.h6{font-size:20px;line-height:1.6;font-weight:400;}
+.h7{font-size:16px;line-height:1.6;font-weight:400;}
+.s3{font-size:12px;line-height:1.6;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.s4{font-size:10px;line-height:1.6;font-weight:500;letter-spacing:.05em;text-transform:uppercase;}
+.l1{font-size:12px;line-height:1;font-weight:500;}
+.l2{font-size:10px;line-height:1;font-weight:500;}
+.b2{font-size:14px;line-height:1.6;}
+.b3{font-size:12px;line-height:1.6;}
+.b4{font-size:10px;line-height:1.6;}
+
+/* ============================================================
+   Header — 80px, 16/24 padding, 1px rule
+   ============================================================ */
+.hdr{
+  position:fixed;inset:0 0 auto 0;z-index:60;height:var(--hdr);
+  background:var(--bg);border-bottom:1px solid var(--line-2);
+  padding:16px var(--gut);
+}
+.hdr__wrap{position:relative;height:48px;display:flex;align-items:center;justify-content:space-between;}
+.hdr__nav,.hdr__util{display:flex;align-items:center;gap:32px;font-size:12px;}
+.hdr__nav a:hover,.hdr__util a:hover{text-decoration:underline;text-underline-offset:3px;}
+.hdr__logo{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:64px;height:40px;display:grid;place-items:center;
+}
+.hdr__logo img{width:100%;height:100%;object-fit:contain;}
+.hdr__burger{display:none;width:24px;height:24px;position:relative;}
+.hdr__burger::before,.hdr__burger::after,.hdr__burger i{
+  content:'';position:absolute;left:2px;right:2px;height:1px;background:var(--ink);
+}
+.hdr__burger::before{top:7px;} .hdr__burger i{top:12px;} .hdr__burger::after{top:17px;}
+
+/* ============================================================
+   Section Stores
+   ============================================================ */
+.stores{background:var(--bg);padding:64px var(--gut) 80px;
+  display:flex;flex-direction:column;align-items:center;gap:32px;}
+.stores__head{display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;max-width:1200px;}
+.stores__title{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.stores__sub{color:var(--txt-2);}
+
+/* ---- region toggle: 600x66, white, 1px #b4b4b4, pill #f0f0f0 ---- */
+.toggle{
+  --pad:9px;
+  position:relative;display:flex;width:600px;max-width:100%;padding:var(--pad);
+  background:var(--white);border:1px solid var(--line);border-radius:999px;
+}
+.toggle__pill{
+  position:absolute;top:var(--pad);left:var(--pad);height:calc(100% - var(--pad)*2);
+  border-radius:999px;background:var(--bg);z-index:1;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),width .35s ease;
+}
+.toggle button{
+  position:relative;z-index:2;flex:1;height:48px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--txt-2);transition:color .25s ease;
+}
+.toggle button.on{color:var(--ink);}
+.toggle button:not(.on):hover{color:var(--ink);}
+/* placeholder marks — the wireframe draws a plain grey circle per tab */
+.toggle .mark{width:24px;height:24px;border-radius:999px;background:var(--ph);flex:none;}
+
+/* ---- card grid: 2 x 584, 32px gutter ---- */
+.stores__grid{width:100%;max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+.store{
+  display:flex;background:var(--white);border:1px solid var(--line);border-radius:8px;
+  overflow:hidden;min-height:320px;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .5s ease,transform .5s ease,border-color .2s ease;
+}
+.store.in{opacity:1;transform:none;}
+.store:hover{border-color:var(--txt-3);}
+.store__img{width:300px;flex:none;background:var(--ph);}
+.store__content{flex:1;padding:32px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;}
+.store__head{display:flex;flex-direction:column;gap:12px;align-items:flex-start;}
+.store__city{
+  display:inline-flex;align-items:center;height:20px;padding:4px 8px;border-radius:999px;
+  border:1px solid var(--txt-3);color:var(--ink);
+  font-size:10px;font-weight:500;line-height:1;letter-spacing:.05em;text-transform:uppercase;
+}
+.store__name{font-size:12px;font-weight:500;line-height:1.6;}
+.store__rows{display:flex;flex-direction:column;gap:12px;font-size:12px;line-height:1.6;color:var(--txt-2);}
+.store__svc{display:flex;flex-wrap:wrap;gap:4px 16px;}
+.store__tag{display:inline-flex;align-items:center;gap:4px;min-height:16px;
+  font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);}
+.store__tag svg{width:16px;height:16px;flex:none;}
+
+.stores__empty{width:100%;max-width:1200px;padding:64px 0;text-align:center;color:var(--txt-2);}
+
+/* ============================================================
+   Footer — main block, divider, white bottom bar
+   ============================================================ */
+.foot{background:var(--bg);border-top:1px solid var(--line-3);}
+.foot__main{display:grid;grid-template-columns:300px 1fr 300px;gap:48px;padding:80px 120px;}
+.foot__brand{display:flex;flex-direction:column;gap:24px;}
+.foot__brand img{width:72px;height:auto;}
+.foot__brand p{font-size:12px;line-height:1.6;color:var(--txt-2);max-width:280px;}
+.foot__cols{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.foot__col h3{font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--txt-3);margin-bottom:16px;}
+.foot__col a{display:block;font-size:12px;line-height:2;width:max-content;}
+.foot__col a:hover{text-decoration:underline;text-underline-offset:3px;}
+.foot__news h3{font-size:12px;font-weight:400;margin-bottom:16px;}
+.foot__news form{display:flex;flex-direction:column;gap:12px;}
+.foot__news input{
+  height:44px;border:1px solid var(--line);background:var(--white);
+  padding:0 16px;font-family:var(--ui);font-size:12px;color:var(--ink);border-radius:0;
+}
+.foot__news input::placeholder{color:var(--txt-3);}
+.foot__news input:focus{outline:none;border-color:var(--txt-3);}
+.btn-fill{
+  height:44px;background:var(--txt-2);color:var(--white);
+  display:inline-flex;align-items:center;justify-content:center;padding:0 24px;
+  font-size:12px;transition:background-color .2s ease;
+}
+.btn-fill:hover{background:var(--ink);}
+.foot__div{height:1px;background:#e0ddd8;}
+.foot__bar{background:var(--white);padding:20px 120px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.foot__c{font-size:12px;color:var(--txt-2);}
+.foot__pay{display:flex;gap:8px;flex-wrap:wrap;}
+.foot__pay span{font-size:10px;color:var(--txt-2);padding:4px 8px;border:1px solid var(--line);border-radius:4px;}
+
+/* ============================================================
+   Mobile — matches "Store Listing Page - Mobile"
+   ============================================================ */
+@media (max-width:767px){
+  :root{--hdr:64px;}
+  .hdr{padding:12px var(--gut);}
+  .hdr__wrap{height:40px;}
+  .hdr__nav,.hdr__util{display:none;}
+  .hdr__burger{display:block;}
+  .hdr__util--m{display:flex;align-items:center;gap:20px;font-size:12px;}
+
+  .stores{padding:32px var(--gut) 48px;gap:24px;}
+  .stores__head{gap:24px;}
+  .toggle{--pad:6px;width:100%;}
+  .toggle button{height:40px;gap:8px;font-size:10px;}
+  .toggle .mark{width:18px;height:18px;}
+
+  .stores__grid{grid-template-columns:1fr;gap:24px;}
+  .store{flex-direction:column;min-height:0;}
+  .store__img{width:100%;height:300px;}
+  .store__content{padding:24px;gap:24px;}
+
+  .foot__main{grid-template-columns:1fr;gap:40px;padding:48px 24px;}
+  .foot__cols{grid-template-columns:1fr 1fr;gap:32px 16px;}
+  .foot__bar{flex-direction:column;align-items:flex-start;gap:16px;padding:20px 24px 32px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="hdr">
+  <div class="hdr__wrap">
+    <nav class="hdr__nav">
+      <a href="#">Shop All</a><a href="#">Gold</a><a href="#">Polki</a>
+      <a href="#">Diamond</a><a href="#">Gemstones</a><a href="#">Heritage</a>
+    </nav>
+    <button class="hdr__burger" aria-label="Menu"><i></i></button>
+    <a class="hdr__logo" href="#" aria-label="Jaipur Gems"><img src="assets/logo-dark.svg" alt="Jaipur Gems"></a>
+    <div class="hdr__util">
+      <a href="#">Visit Us</a><a href="#">Search</a><a href="#">Account</a><a href="#">Cart (0)</a>
+    </div>
+    <div class="hdr__util hdr__util--m" style="display:none">
+      <a href="#">Search</a><a href="#">Cart (0)</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= SECTION STORES ================= -->
+<main class="stores">
+  <div class="stores__head">
+    <div class="stores__title">
+      <h1 class="h6">Our Stores</h1>
+      <p class="b2 stores__sub">Visit our boutiques across India and the UAE</p>
+    </div>
+
+    <div class="toggle" id="storeToggle">
+      <span class="toggle__pill" id="togglePill"></span>
+      <button class="on" data-region="all"><span class="mark"></span>All Stores</button>
+      <button data-region="india"><span class="mark"></span>India</button>
+      <button data-region="uae"><span class="mark"></span>UAE</button>
+    </div>
+  </div>
+
+  <div class="stores__grid" id="storesGrid"></div>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="foot">
+  <div class="foot__main">
+    <div class="foot__brand">
+      <img src="assets/logo-dark.svg" alt="Jaipur Gems">
+      <p>Rooted in India&rsquo;s finest artisanal traditions, Jaipur Gems has been designing and crafting jewellery by hand since 1974 &mdash; pieces made not for a season, but for a lifetime.</p>
+    </div>
+
+    <nav class="foot__cols">
+      <div class="foot__col">
+        <h3>Shop</h3>
+        <a href="#">Gold</a><a href="#">Polki</a><a href="#">Diamond</a><a href="#">Gemstone</a><a href="#">Shop All</a>
+      </div>
+      <div class="foot__col">
+        <h3>About</h3>
+        <a href="#">Our Story</a><a href="#">Journal</a><a href="#">Contact Us</a><a href="#">Stores</a>
+      </div>
+      <div class="foot__col">
+        <h3>Socials</h3>
+        <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">X</a><a href="#">Pinterest</a>
+      </div>
+      <div class="foot__col">
+        <h3>Legal</h3>
+        <a href="#">Privacy Policy</a><a href="#">Refund Policy</a><a href="#">Terms of Service</a>
+      </div>
+    </nav>
+
+    <div class="foot__news">
+      <h3>Subscribe to Our Newsletter</h3>
+      <form onsubmit="return false">
+        <input type="email" placeholder="Your e-mail" aria-label="Your e-mail">
+        <button class="btn-fill" type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="foot__div"></div>
+
+  <div class="foot__bar">
+    <span class="foot__c">&copy; 2026 Jaipur Gems</span>
+    <span class="foot__pay">
+      <span>Visa</span><span>Mastercard</span><span>Amex</span><span>PayPal</span><span>Diners</span><span>Discover</span>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   1 — store data
+   ============================================================ */
+var CHECK = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
+  + '<circle cx="8" cy="8" r="6.25" stroke="#545454" stroke-width="1"/>'
+  + '<path d="M5.4 8.2 7.1 9.9l3.5-3.6" stroke="#545454" stroke-width="1" '
+  + 'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+var STORES = [
+  { slug:'turner-road', region:'india', city:'Mumbai', name:'Jaipur Gems — Turner Road',
+    addr:'Turner Road, Bandra West,<br>Mumbai 400050, India',
+    phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun',
+    svc:['Private Viewings','High Jewellery','Bespoke Commissions'] },
+
+  { slug:'hughes-road', region:'india', city:'Mumbai', name:'Jaipur Gems — Hughes Road',
+    addr:'Hughes Road, Girgaon,<br>Mumbai 400007, India',
+    phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun',
+    svc:['Private Viewings','Bridal Consultation','After-Sales Care'] },
+
+  { slug:'anna-salai', region:'india', city:'Chennai', name:'Jaipur Gems — Anna Salai',
+    addr:'Anna Salai, Chennai,<br>Tamil Nadu, India',
+    phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun',
+    svc:['Private Viewings','Bridal Consultation','Bespoke Commissions'] },
+
+  { slug:'coimbatore', region:'india', city:'Coimbatore', name:'Jaipur Gems — Coimbatore',
+    addr:'Coimbatore,<br>Tamil Nadu, India',
+    phone:'+91 81080 41000', hours:'Open 11:00 AM – 8:00 PM,<br>Mon – Sun',
+    svc:['Private Viewings','Bridal Consultation','Gemstone Expertise'] },
+
+  { slug:'nation-towers', region:'uae', city:'Abu Dhabi', name:'Jaipur Gems — Nation Towers',
+    addr:'Nation Towers, 1st Street, Al Bateen,<br>W44, Abu Dhabi, UAE',
+    phone:'+971 2517 6220', hours:'Open 10:00 AM – 10:00 PM,<br>Mon – Sun',
+    svc:['Private Viewings','Bridal Consultation','Virtual Appointments'] },
+
+  { slug:'galleria-mall', region:'uae', city:'Dubai', name:'Jaipur Gems — Galleria Mall',
+    addr:'Galleria Mall, Ground Floor, F&amp;B-10,<br>329 Street, Al Barsha 2, Dubai, UAE',
+    phone:'+971 2517 6221', hours:'Open 10:00 AM – 10:00 PM,<br>Mon – Sun',
+    svc:['Private Viewings','Bridal Consultation','Virtual Appointments'] }
+];
+
+/* ============================================================
+   2 — render + filter
+   ============================================================ */
+var grid = document.getElementById('storesGrid');
+
+function cardHTML(s){
+  return '<a class="store" href="jg-wireframe-store-detail.html?store=' + s.slug + '">'
+    + '<span class="store__img"></span>'
+    + '<span class="store__content">'
+    +   '<span class="store__head">'
+    +     '<span class="store__city">' + s.city + '</span>'
+    +     '<span class="store__name">' + s.name + '</span>'
+    +   '</span>'
+    +   '<span class="store__rows">'
+    +     '<span>' + s.addr + '</span>'
+    +     '<span>' + s.phone + '</span>'
+    +     '<span>' + s.hours + '</span>'
+    +   '</span>'
+    +   '<span class="store__svc">'
+    +     s.svc.map(function(t){ return '<span class="store__tag">' + CHECK + t + '</span>'; }).join('')
+    +   '</span>'
+    + '</span></a>';
+}
+
+function render(region){
+  var list = STORES.filter(function(s){ return region === 'all' || s.region === region; });
+  if (!list.length){
+    grid.innerHTML = '<p class="stores__empty b3">No boutiques listed in this region yet.</p>';
+    return;
+  }
+  grid.innerHTML = list.map(cardHTML).join('');
+  reveal();
+}
+
+function reveal(){
+  var cards = grid.querySelectorAll('.store');
+  if (!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    });
+  }, { rootMargin:'0px 0px -8% 0px' });
+  cards.forEach(function(c){ io.observe(c); });
+  /* failsafe so nothing can stay invisible */
+  setTimeout(function(){ cards.forEach(function(c){ c.classList.add('in'); }); }, 2000);
+}
+
+/* ============================================================
+   3 — region toggle
+   ============================================================ */
+var toggle = document.getElementById('storeToggle');
+var pill   = document.getElementById('togglePill');
+var tabs   = toggle.querySelectorAll('button');
+
+function movePill(btn){
+  var first = tabs[0];
+  pill.style.width = btn.offsetWidth + 'px';
+  pill.style.transform = 'translateX(' + (btn.offsetLeft - first.offsetLeft) + 'px)';
+}
+tabs.forEach(function(btn){
+  btn.addEventListener('click', function(){
+    tabs.forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    movePill(btn);
+    render(btn.dataset.region);
+  });
+});
+function syncPill(){ movePill(toggle.querySelector('button.on')); }
+window.addEventListener('resize', syncPill);
+window.addEventListener('load', syncPill);
+
+/* mobile swaps the full utility nav for the short one */
+function syncNav(){
+  var m = window.matchMedia('(max-width:767px)').matches;
+  document.querySelector('.hdr__util--m').style.display = m ? 'flex' : 'none';
+}
+window.addEventListener('resize', syncNav);
+syncNav();
+
+render('all');
+syncPill();
+</script>
+</body>
+</html>
