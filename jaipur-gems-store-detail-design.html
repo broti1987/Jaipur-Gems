@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jaipur Gems — Turner Road, Bandra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gotu&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   JG design tokens
+   ============================================================ */
+:root{
+  --sand-50:#FDFBF7;  --sand-100:#FAF4EA; --sand-200:#F7EDDF; --sand-300:#F2E7DC;
+  --sand-400:#EDE1CF; --sand-500:#D6C3A8; --sand-600:#B59E7D; --sand-700:#8C7859;
+  --sand-800:#61533D;
+  --ink:#14110F; --ink-2:#1E1A12; --black:#000000; --white:#FFFFFF;
+  --crimson:#850000;
+
+  --display:'Gotu',serif;
+  --ui:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+
+  --gut:24px;
+  --gut-m:16px;
+  --hdr:80px;
+  --hdr-m:64px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;overflow-x:clip;}
+body{
+  margin:0;background:var(--sand-100);color:var(--black);
+  font-family:var(--ui);font-size:12px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:clip;
+  padding-top:var(--hdr);
+}
+img{display:block;max-width:100%;}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:400;line-height:1.6;text-wrap:balance;}
+p{margin:0;text-wrap:pretty;}
+
+.eyebrow{font-weight:600;font-size:10px;line-height:1.3;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--crimson);}
+.btn-label{font-weight:600;font-size:10px;line-height:1;letter-spacing:.10em;text-transform:uppercase;}
+/* small caps label used above every data block */
+.field-label{font-weight:600;font-size:10px;line-height:1.3;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--sand-700);}
+
+.nugget{display:inline-grid;place-items:center;width:8px;height:8px;flex:none;}
+.nugget::after{content:'';width:4px;height:4px;background:var(--sand-600);transform:rotate(45deg);}
+
+/* rails — native scroll + snap, scrollbar hidden */
+.rail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;
+  touch-action:pan-x pan-y;overscroll-behavior-x:contain;}
+.rail::-webkit-scrollbar{display:none;}
+
+/* 40px circular arrow pair */
+.arrows{display:flex;gap:8px;}
+.arrows button{
+  width:40px;height:40px;border-radius:999px;background:var(--sand-200);
+  border:1px solid var(--sand-400);display:grid;place-items:center;
+  transition:background-color .25s ease,border-color .25s ease,opacity .25s ease;
+}
+.arrows button:hover{background:var(--sand-50);border-color:var(--sand-600);}
+.arrows button[disabled]{opacity:.4;cursor:default;}
+.arrows svg{width:20px;height:20px;}
+
+/* ============================================================
+   Header / Regular Header
+   ============================================================ */
+.hdr{
+  position:fixed;inset:0 0 auto 0;z-index:60;height:var(--hdr);
+  background:var(--sand-100);padding:16px var(--gut);transition:box-shadow .3s ease;
+}
+.hdr.is-stuck{box-shadow:0 1px 0 var(--sand-400);}
+.hdr__wrap{position:relative;height:48px;display:flex;align-items:center;justify-content:space-between;}
+.hdr__nav{display:flex;align-items:center;gap:16px;}
+.hdr__nav a{padding:0 8px;font-weight:600;font-size:10px;line-height:1;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--ink);transition:color .25s ease;}
+.hdr__nav a:hover{color:var(--crimson);}
+.hdr__nav a em{font-style:normal;color:var(--crimson);}
+.hdr__logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:73px;height:40px;}
+.hdr__logo img{width:100%;height:100%;object-fit:contain;}
+.hdr__menu{display:none;font-weight:600;font-size:10px;line-height:1;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--ink);}
+.hdr__burger{display:none;width:24px;height:24px;position:relative;}
+.hdr__burger::before,.hdr__burger::after,.hdr__burger i{
+  content:'';position:absolute;left:2px;right:2px;height:1px;background:var(--ink);}
+.hdr__burger::before{top:8px;} .hdr__burger i{top:12px;} .hdr__burger::after{top:16px;}
+
+/* ============================================================
+   1 — Breadcrumb
+   ============================================================ */
+.crumbs{padding:20px 48px;display:flex;align-items:center;gap:10px;background:var(--sand-100);}
+.crumbs a{font-size:12px;color:var(--sand-700);transition:color .25s ease;}
+.crumbs a:hover{color:var(--crimson);}
+.crumbs i{width:3px;height:3px;border-radius:999px;background:var(--sand-500);display:block;}
+.crumbs b{font-weight:400;font-size:12px;color:var(--ink-2);}
+
+/* ============================================================
+   2 — Gallery: 900px slides, 16px gap, next slide peeking
+   ============================================================ */
+.sgal{
+  --slide:clamp(420px, calc(100vw - 540px), 900px);
+  position:relative;
+}
+.sgal__rail{gap:16px;padding:0 var(--gut);scroll-padding-left:var(--gut);}
+.sgal__slide{
+  flex:0 0 var(--slide);height:520px;border-radius:16px;overflow:hidden;
+  background:var(--sand-300) center/cover no-repeat;scroll-snap-align:start;
+}
+/* overlays sit over the first slide's box, not inside the scrolling rail */
+.sgal__stage{
+  position:absolute;left:var(--gut);top:0;width:var(--slide);height:520px;
+  pointer-events:none;z-index:3;
+}
+.sgal__tag{
+  position:absolute;left:25px;top:25px;
+  display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;
+  background:rgba(255,255,255,.30);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  font-weight:600;font-size:10px;line-height:1.3;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--white);
+}
+.sgal__intro{
+  position:absolute;left:24px;bottom:25px;width:400px;
+  background:var(--sand-50);border:1px solid var(--sand-400);border-radius:12px;padding:24px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.sgal__title{display:flex;flex-direction:column;gap:4px;}
+.sgal__title .k{font-family:var(--display);font-size:14px;line-height:1.6;color:var(--crimson);}
+.sgal__title h1{font-size:20px;color:var(--black);}
+.sgal__intro p{font-size:12px;line-height:1.6;color:var(--sand-800);}
+.sgal__arrows{position:absolute;right:24px;bottom:24px;pointer-events:auto;}
+/* pagination is the brand nugget, not a circle: a 4px square rotated 45deg
+   inside a 12px box, Sand 600 at rest and Sand 800 for the active slide */
+.sgal__dots{display:none;justify-content:center;gap:4px;padding:16px 0 0;}
+.sgal__dots i{width:12px;height:12px;display:grid;place-items:center;}
+.sgal__dots i::after{content:'';width:4px;height:4px;background:var(--sand-600);
+  transform:rotate(45deg);transition:background-color .25s ease;}
+.sgal__dots i.on::after{background:var(--sand-800);}
+
+/* ============================================================
+   3 — Details: 300px column + map
+   ============================================================ */
+.sdet{padding:48px var(--gut);display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start;}
+.sdet__col{height:520px;padding-left:24px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;}
+.sdet__contact{display:flex;flex-direction:column;gap:24px;}
+.sdet__block{display:flex;flex-direction:column;gap:6px;}
+.sdet__block p{font-size:12px;line-height:1.6;color:var(--sand-800);}
+.sdet__svc{display:flex;flex-direction:column;gap:12px;}
+.sdet__tag{display:inline-flex;align-items:center;gap:4px;
+  font-weight:600;font-size:10px;line-height:1.2;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--sand-800);}
+.sdet__map{position:relative;height:520px;border:1px solid var(--sand-400);border-radius:16px;
+  overflow:hidden;background:var(--sand-400);}
+.sdet__map-ph{position:absolute;inset:0;display:grid;place-items:center;
+  font-weight:600;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--sand-700);}
+/* live Google embed, untreated. Centred with `ll` rather than `q` so Google
+   draws neither its own marker nor the place card — we drop our own pin on top. */
+.sdet__map iframe{position:relative;z-index:1;display:block;width:100%;height:100%;border:0;}
+.sdet__pin{position:absolute;left:50%;top:50%;z-index:2;
+  transform:translate(-50%,-100%);pointer-events:none;}
+.sdet__pin svg{width:28px;height:36px;}
+
+/* ============================================================
+   4 — Google reviews
+   ============================================================ */
+.srev{background:var(--sand-100);padding:64px 0 64px 48px;display:flex;gap:48px;align-items:flex-start;}
+.srev__left{width:276px;flex:none;height:360px;display:flex;flex-direction:column;justify-content:space-between;}
+.srev__sum{display:flex;flex-direction:column;gap:12px;}
+.srev__score{font-family:var(--display);font-size:44px;line-height:1.1;letter-spacing:-.0025em;color:var(--black);}
+.stars{display:flex;gap:4px;line-height:1;}
+.stars span{color:var(--crimson);font-size:16px;line-height:1;}
+.stars span.off{color:var(--sand-500);}
+.srev__cap{font-size:12px;line-height:1.6;color:var(--sand-800);}
+.srev__rail{flex:1;gap:24px;}
+.rcard{
+  flex:0 0 300px;height:360px;background:var(--sand-50);
+  border:1px solid var(--sand-400);border-radius:16px;padding:24px;
+  display:flex;flex-direction:column;justify-content:space-between;scroll-snap-align:start;
+}
+.rcard .stars{gap:3px;} .rcard .stars span{font-size:12px;}
+.rcard p{font-size:16px;line-height:1.6;color:var(--black);}
+.rcard__meta{display:flex;flex-direction:column;gap:4px;}
+.rcard__meta b{font-weight:600;font-size:12px;line-height:1.3;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--black);}
+.rcard__meta span{font-size:10px;line-height:1.7;color:var(--sand-700);}
+
+/* ============================================================
+   5 — Products available in store
+   ============================================================ */
+.sprod{padding:60px 0;display:flex;flex-direction:column;gap:32px;}
+.sprod__head{padding:0 var(--gut);text-align:center;}
+.sprod__head h2{font-size:20px;color:var(--black);}
+.sprod__stage{position:relative;}
+.sprod__rail{gap:24px;padding:0 var(--gut);scroll-padding-left:var(--gut);}
+
+/* Madrid-style edge zones: the native pointer is hidden and replaced by a
+   trailing underlined "Previous" / "Next" label that follows the cursor */
+.sprod__zone{
+  position:absolute;top:0;bottom:0;width:200px;z-index:5;
+  background:none;border:0;padding:0;cursor:none;
+}
+.sprod__zone[data-type="prev"]{left:0;}
+.sprod__zone[data-type="next"]{right:0;}
+.gcursor{
+  position:fixed;left:0;top:0;height:20px;z-index:80;pointer-events:none;
+  display:grid;place-items:center;opacity:0;transition:opacity .4s ease;
+}
+.gcursor:not([data-type=""]){opacity:1;}
+.gcursor__label{
+  font-weight:600;font-size:10px;line-height:1;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--ink);white-space:nowrap;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.pcard{flex:0 0 330px;display:flex;flex-direction:column;gap:12px;padding-bottom:24px;scroll-snap-align:start;}
+.pcard__img{height:330px;background:var(--sand-400) center/cover no-repeat;overflow:hidden;}
+.pcard__img i{display:block;width:100%;height:100%;background:inherit;
+  transition:transform .9s cubic-bezier(.22,1,.36,1);}
+.pcard:hover .pcard__img i{transform:scale(1.04);}
+.pcard__info{display:flex;align-items:center;justify-content:space-between;gap:10px;height:16px;}
+.pcard__name{font-size:12px;line-height:1.3;color:var(--black);}
+.pcard__price{font-weight:600;font-size:10px;line-height:1.3;letter-spacing:.10em;
+  text-transform:uppercase;color:var(--sand-700);}
+
+/* ============================================================
+   6 — FAQ
+   ============================================================ */
+.sfaq{background:var(--sand-100);display:flex;}
+.sfaq__half{flex:1 1 50%;padding:120px;display:flex;justify-content:center;}
+.sfaq__form{width:450px;min-height:380px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;}
+.sfaq__head{display:flex;flex-direction:column;gap:32px;}
+.sfaq__badge{width:100px;height:100px;border-radius:999px;border:1px solid var(--sand-500);
+  display:grid;place-items:center;}
+.sfaq__badge svg{width:48px;height:48px;}
+.sfaq__head h2{font-size:24px;color:var(--black);}
+.sfaq__bottom{display:flex;flex-direction:column;gap:24px;align-items:flex-start;}
+.sfaq__bottom p{font-size:12px;line-height:1.7;color:var(--sand-800);max-width:330px;}
+.btn-solid{
+  position:relative;overflow:hidden;height:44px;border-radius:999px;
+  background:var(--black);color:var(--sand-100);
+  display:inline-flex;align-items:center;justify-content:center;padding:12px 24px;
+  transition:background-color .3s ease;
+}
+.btn-solid:hover{background:var(--crimson);}
+.btn-solid::after{
+  content:'';position:absolute;top:0;bottom:0;left:-90%;width:80%;
+  background:linear-gradient(90deg,
+    rgba(197,164,104,0) 0%,rgba(197,164,104,.17) 30%,
+    rgba(197,164,104,.28) 50%,
+    rgba(197,164,104,.17) 70%,rgba(197,164,104,0) 100%);
+  pointer-events:none;animation:ctaGlint 7.5s linear infinite;
+}
+@keyframes ctaGlint{
+  from{transform:translateX(0) skewX(-14deg);}
+  to  {transform:translateX(330%) skewX(-14deg);}
+}
+.btn-line{
+  height:36px;border-radius:999px;border:1px solid var(--sand-700);color:var(--black);
+  display:inline-flex;align-items:center;justify-content:center;padding:12px 24px;
+  transition:background-color .3s ease,border-color .3s ease,color .3s ease;
+}
+.btn-line:hover{background:var(--black);border-color:var(--black);color:var(--sand-100);}
+
+.faqs{width:450px;display:flex;flex-direction:column;}
+.faq{padding-bottom:14px;}
+.faq__q{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:16px 0;text-align:left;
+  font-family:var(--display);font-size:14px;line-height:1.6;color:var(--ink-2);
+  border-bottom:1px dotted var(--sand-500);transition:color .25s ease;
+}
+.faq__q:hover{color:var(--crimson);}
+.faq__sign{position:relative;width:16px;height:16px;flex:none;}
+.faq__sign::before,.faq__sign::after{content:'';position:absolute;background:var(--ink-2);
+  transition:transform .3s ease,opacity .3s ease;}
+.faq__sign::before{left:0;top:7.5px;width:16px;height:1px;}
+.faq__sign::after{top:0;left:7.5px;width:1px;height:16px;}
+.faq.open .faq__sign::after{transform:scaleY(0);opacity:0;}
+.faq__a{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.faq__a p{font-size:12px;line-height:1.7;color:var(--sand-800);padding:16px 32px 0 0;}
+
+/* ============================================================
+   7 — Global Concierge
+   ============================================================ */
+.scon{background:var(--sand-400);padding:96px 60px;
+  display:flex;flex-direction:column;align-items:center;gap:54px;}
+.scon__top{width:686px;max-width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;}
+.scon__tag{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;}
+.scon__top h2{font-size:24px;color:var(--black);}
+.scon__top p{width:369px;max-width:100%;font-size:12px;line-height:1.6;color:var(--sand-800);}
+.scon__row{display:flex;align-items:stretch;gap:160px;}
+.scon__cta{width:310px;padding:0 36px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;}
+.scon__icon{width:100px;height:100px;border-radius:999px;background:var(--sand-100);
+  border:1px solid var(--sand-500);display:grid;place-items:center;}
+.scon__icon svg{width:48px;height:48px;}
+.scon__head{display:flex;flex-direction:column;gap:8px;}
+.scon__head h3{font-size:20px;color:var(--black);}
+.scon__head p{font-size:12px;line-height:1.6;color:var(--sand-800);}
+/* decorative divider: nugget, dotted rule, terminal square */
+.scon__div{width:24px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.scon__div .cap{width:24px;height:24px;display:grid;place-items:center;}
+.scon__div .cap::after{content:'';width:6px;height:6px;background:var(--sand-600);transform:rotate(45deg);}
+.scon__div .line{flex:1;width:1px;background-image:linear-gradient(to bottom,var(--sand-800) 1px,transparent 1px);
+  background-size:1px 4px;}
+.scon__div .end{width:3px;height:3px;background:var(--sand-600);}
+
+/* ============================================================
+   8 — Footer / Standard Footer
+   ============================================================ */
+.foot{background:var(--black);color:var(--white);}
+.foot__main{display:flex;justify-content:space-between;gap:48px;padding:80px 120px;}
+.foot__brand{width:280px;display:flex;flex-direction:column;gap:12px;}
+.foot__brand img{width:80px;height:auto;}
+.foot__brand p{width:200px;font-size:10px;line-height:1.8;color:var(--white);}
+.foot__cols{display:flex;gap:56px;}
+.foot__col{display:flex;flex-direction:column;gap:12px;}
+.foot__col h3{font-family:var(--ui);font-weight:600;font-size:10px;line-height:1.3;
+  letter-spacing:.10em;text-transform:uppercase;color:var(--sand-600);}
+.foot__col a{font-size:10px;line-height:1.6;color:var(--white);width:max-content;transition:color .25s ease;}
+.foot__col a:hover{color:var(--sand-600);}
+.foot__news{width:280px;display:flex;flex-direction:column;gap:20px;}
+.foot__news h3{font-family:var(--ui);font-weight:600;font-size:10px;line-height:1.3;
+  letter-spacing:.10em;text-transform:uppercase;color:var(--sand-600);}
+.foot__news form{display:flex;flex-direction:column;gap:10px;}
+.foot__news input{height:44px;border-radius:999px;border:1px solid var(--sand-800);background:transparent;
+  padding:0 20px;font-family:var(--ui);font-size:10px;color:var(--sand-100);}
+.foot__news input::placeholder{color:var(--sand-700);}
+.foot__news input:focus{outline:none;border-color:var(--sand-600);}
+.foot__news .btn-solid{background:var(--sand-700);}
+.foot__news .btn-solid:hover{background:var(--crimson);}
+.foot__bar{background:var(--ink-2);padding:20px 120px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.foot__c{font-size:10px;line-height:1.7;color:var(--sand-600);}
+.foot__pay{display:flex;gap:6px;flex-wrap:wrap;}
+.foot__pay span{font-size:10px;line-height:1.7;color:var(--sand-600);
+  padding:5px 8px;border-radius:4px;border:1px solid rgba(181,158,125,.28);}
+
+/* the intro block only exists below the breakpoint, where the card
+   drops out of the image and becomes its own section */
+.sintro{display:none;}
+
+/* ============================================================
+   Mobile — Store Detail Page · Mobile
+   ============================================================ */
+@media (max-width:767px){
+  body{padding-top:var(--hdr-m);}
+  .hdr{height:var(--hdr-m);padding:12px var(--gut-m);}
+  .hdr__wrap{height:40px;}
+  /* mobile header: burger + MENU on the left, CART on the right */
+  .hdr__nav--left a,.hdr__nav--right a:nth-child(-n+3){display:none;}
+  .hdr__nav--left{gap:8px;}
+  .hdr__burger{display:block;}
+  .hdr__menu{display:block;}
+  .hdr__logo{width:58px;height:32px;}
+
+  .crumbs{padding:20px 24px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;}
+  .crumbs::-webkit-scrollbar{display:none;}
+
+  /* gallery: short slides, dots instead of arrows, intro card moves below */
+  /* slides are square on mobile */
+  .sgal{--slide:calc(100vw - 48px);}
+  .sgal__rail{gap:12px;}
+  .sgal__slide{height:var(--slide);}
+  .sgal__stage{height:var(--slide);}
+  .sgal__intro,.sgal__arrows{display:none;}
+  .sgal__dots{display:flex;}
+
+  .sintro{display:flex;flex-direction:column;gap:12px;padding:24px 24px 0;}
+  .sintro .k{font-family:var(--display);font-size:14px;line-height:1.6;color:var(--crimson);}
+  .sintro h1{font-size:20px;color:var(--black);}
+  .sintro p{font-size:12px;line-height:1.6;color:var(--sand-800);}
+
+  .sdet{grid-template-columns:1fr;gap:32px;padding:24px;}
+  .sdet__col{height:auto;padding-left:0;gap:32px;}
+  .sdet__contact{gap:20px;}
+  .sdet__map{height:240px;}
+
+  .srev{flex-direction:column;gap:24px;padding:32px 0;}
+  .srev__left{width:100%;height:auto;padding:0 24px;gap:8px;}
+  .srev__sum{gap:8px;}
+  .srev__rating{display:flex;align-items:center;gap:12px;}
+  .srev__score{font-size:28px;}
+  .srev__arrows{display:none;}
+  .srev__rail{gap:16px;padding:0 24px;scroll-padding-left:24px;}
+  .rcard{flex:0 0 280px;}
+
+  .sprod{padding:40px 0;gap:24px;}
+  .sprod__head h2{font-size:16px;}
+  .sprod__rail{gap:24px;}
+  .sprod__zone,.gcursor{display:none;}
+  .pcard{flex:0 0 320px;}
+  .pcard__img{height:320px;}
+
+  .sfaq{flex-direction:column;padding:48px 0;gap:32px;}
+  /* in a column container flex-basis is height — the 50% basis from desktop
+     would force the two halves to equal heights, so reset it */
+  .sfaq__half{flex:0 0 auto;padding:0 24px;}
+  .sfaq__form,.faqs{width:100%;min-height:0;gap:16px;}
+  /* the whole intro block centres on mobile — badge, heading, note and CTA */
+  .sfaq__form{align-items:center;text-align:center;}
+  .sfaq__head{gap:16px;align-items:center;}
+  .sfaq__head h2{font-size:20px;}
+  .sfaq__badge{width:86px;height:86px;}
+  .sfaq__badge svg{width:40px;height:40px;}
+  .sfaq__bottom{gap:16px;align-items:center;}
+  .sfaq__bottom p{max-width:none;}
+
+  .scon{padding:64px 48px;gap:0;}
+  .scon__top{width:100%;gap:16px;}
+  .scon__top h2{font-size:16px;}
+  .scon__top p{width:100%;}
+  .scon__row{flex-direction:column;align-items:center;gap:0;}
+  .scon__cta{padding:40px 36px;}
+  .scon__div{width:24px;height:72px;flex-direction:column;}
+
+  .foot__main{flex-direction:column;gap:32px;padding:64px 24px 32px;}
+  .foot__brand,.foot__news{width:100%;}
+  .foot__brand p{width:100%;font-size:12px;}
+  .foot__cols{justify-content:space-between;gap:24px;}
+  .foot__bar{flex-direction:column-reverse;align-items:flex-start;gap:12px;padding:24px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="hdr" id="hdr">
+  <div class="hdr__wrap">
+    <nav class="hdr__nav hdr__nav--left">
+      <button class="hdr__burger" aria-label="Menu"><i></i></button>
+      <span class="hdr__menu">Menu</span>
+      <a href="#">Shop All</a><a href="#">Gold</a><a href="#">Polki</a>
+      <a href="#">Diamond</a><a href="#">Gemstones</a><a href="#">Heritage</a>
+    </nav>
+
+    <a class="hdr__logo" href="#" aria-label="Jaipur Gems"><img src="assets/logo-dark.svg" alt="Jaipur Gems"></a>
+
+    <nav class="hdr__nav hdr__nav--right">
+      <a href="#">Visit Us</a><a href="#">Search</a><a href="#">Account</a>
+      <a href="#">Cart <em>(0)</em></a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= 1 · BREADCRUMB ================= -->
+<nav class="crumbs">
+  <a href="jaipur-gems-store-listing-design.html">Stores</a>
+  <i></i>
+  <b>Turner Road, Mumbai</b>
+</nav>
+
+<!-- ================= 2 · GALLERY ================= -->
+<section class="sgal">
+  <div class="rail sgal__rail" id="galRail">
+    <div class="sgal__slide" style="background-image:url('assets/store-interior-1.webp')"></div>
+    <div class="sgal__slide" style="background-image:url('assets/store-interior-2.webp')"></div>
+    <div class="sgal__slide" style="background-image:url('assets/store-interior-3.webp')"></div>
+    <div class="sgal__slide" style="background-image:url('assets/store-interior-4.webp')"></div>
+    <div class="sgal__slide" style="background-image:url('assets/store-interior-5.webp')"></div>
+  </div>
+
+  <div class="sgal__stage">
+    <span class="sgal__tag">Mumbai</span>
+
+    <div class="sgal__intro">
+      <div class="sgal__title">
+        <span class="k">Jaipur Gems</span>
+        <h1>Turner Road, Bandra</h1>
+      </div>
+      <p>Our Bandra store sits just off the Turner Road junction, behind a quiet entrance. Everyday gold and diamonds on the ground floor; private rooms upstairs for bridal and high jewellery, where pieces are brought up one at a time.</p>
+    </div>
+
+    <div class="arrows sgal__arrows" id="galArrows">
+      <button data-dir="-1" aria-label="Previous">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M16 10H4m0 0 5-5m-5 5 5 5" stroke="#14110F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button data-dir="1" aria-label="Next">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0-5-5m5 5-5 5" stroke="#14110F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="sgal__dots" id="galDots"></div>
+</section>
+
+<!-- mobile only: the intro card drops out of the image -->
+<section class="sintro">
+  <div class="sgal__title">
+    <span class="k">Jaipur Gems</span>
+    <h1>Turner Road, Bandra</h1>
+  </div>
+  <p>Our Bandra store sits just off the Turner Road junction, behind a quiet entrance. Everyday gold and diamonds on the ground floor; private rooms upstairs for bridal and high jewellery, where pieces are brought up one at a time.</p>
+</section>
+
+<!-- ================= 3 · DETAILS ================= -->
+<section class="sdet">
+  <div class="sdet__col">
+    <div class="sdet__contact">
+      <div class="sdet__block">
+        <span class="field-label">Address</span>
+        <p>Turner Road, Bandra West,<br>Mumbai 400050, India</p>
+      </div>
+      <div class="sdet__block">
+        <span class="field-label">Phone</span>
+        <p>+91 81080 41000</p>
+      </div>
+      <div class="sdet__block">
+        <span class="field-label">Hours</span>
+        <p>Open 11:00 AM – 8:00 PM,<br>Mon – Sun</p>
+      </div>
+    </div>
+
+    <div class="sdet__svc">
+      <span class="field-label">Services</span>
+      <div id="svcList" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+  </div>
+
+  <div class="sdet__map">
+    <span class="sdet__map-ph">Google Map embed</span>
+    <iframe
+      src="https://maps.google.com/maps?ll=19.059476,72.8361762&z=16&output=embed"
+      title="Map — Jaipur Gems, Turner Road, Bandra West, Mumbai"
+      loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+    <span class="sdet__pin" aria-hidden="true">
+      <svg viewBox="0 0 28 36" fill="none">
+        <path d="M14 35c0 0 11-12.6 11-21A11 11 0 1 0 3 14c0 8.4 11 21 11 21Z"
+              fill="#850000" stroke="#FDFBF7" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="13.6" r="3.6" fill="#FDFBF7"/>
+      </svg>
+    </span>
+  </div>
+</section>
+
+<!-- ================= 4 · GOOGLE REVIEWS ================= -->
+<!-- placeholder content: no Google listing was found for this store,
+     so the score, count and all reviews are dummy copy -->
+<section class="srev">
+  <div class="srev__left">
+    <div class="srev__sum">
+      <span class="field-label" style="color:var(--sand-800)">Google Reviews</span>
+      <div class="srev__rating">
+        <span class="srev__score">4.8</span>
+        <span class="stars"><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span></span>
+      </div>
+      <span class="srev__cap">Based on 186 Google reviews</span>
+    </div>
+
+    <div class="arrows srev__arrows" id="revArrows">
+      <button data-dir="-1" aria-label="Previous">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M16 10H4m0 0 5-5m-5 5 5 5" stroke="#14110F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button data-dir="1" aria-label="Next">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0-5-5m5 5-5 5" stroke="#14110F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="rail srev__rail" id="revRail"></div>
+</section>
+
+<!-- ================= 5 · PRODUCTS AVAILABLE IN STORE ================= -->
+<section class="sprod">
+  <div class="sprod__head"><h2>Products Available in Store</h2></div>
+
+  <div class="sprod__stage">
+    <div class="rail sprod__rail" id="prodRail"></div>
+    <button class="sprod__zone" data-type="prev" aria-label="Previous"></button>
+    <button class="sprod__zone" data-type="next" aria-label="Next"></button>
+  </div>
+</section>
+<div class="gcursor" id="galCursor" data-type="" aria-hidden="true"><span class="gcursor__label"></span></div>
+
+<!-- ================= 6 · FAQ ================= -->
+<section class="sfaq">
+  <div class="sfaq__half">
+    <div class="sfaq__form">
+      <div class="sfaq__head">
+        <span class="sfaq__badge">
+          <!-- contact_support, exported from the design file -->
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <path d="M26.827 40.5385L26.7115 36.231H23.1345C18.9322 36.231 15.3592 34.7592 12.4155 31.8155C9.47183 28.8718 8 25.2987 8 21.096C8 16.9193 9.47367 13.3592 12.421 10.4155C15.3687 7.47183 18.9475 6 23.1575 6C25.2422 6 27.1838 6.3865 28.9825 7.1595C30.7815 7.9325 32.3477 8.996 33.681 10.35C35.0143 11.704 36.0675 13.2943 36.8405 15.121C37.6135 16.948 38 18.9282 38 21.0615C38 22.9538 37.7392 24.8205 37.2175 26.6615C36.6955 28.5025 35.946 30.2628 34.969 31.9425C33.9923 33.6218 32.813 35.1897 31.431 36.646C30.0487 38.1027 28.514 39.4002 26.827 40.5385ZM28.1345 37.5615C30.6628 35.4412 32.6827 32.938 34.194 30.052C35.7057 27.166 36.4615 24.1692 36.4615 21.0615C36.4615 17.1845 35.1827 13.9615 32.625 11.3925C30.0673 8.82317 26.9115 7.5385 23.1575 7.5385C19.3628 7.5385 16.1443 8.85967 13.502 11.502C10.8597 14.1443 9.5385 17.3423 9.5385 21.096C9.5385 24.8757 10.8597 28.0867 13.502 30.729C16.1443 33.3713 19.3552 34.6925 23.1345 34.6925H28.1345V37.5615ZM24.2575 31.127C24.5345 30.85 24.673 30.5218 24.673 30.1425C24.673 29.7628 24.5345 29.4345 24.2575 29.1575C23.9808 28.8808 23.6463 28.7425 23.254 28.7425C22.8617 28.7425 22.527 28.8808 22.25 29.1575C21.973 29.4345 21.8345 29.7628 21.8345 30.1425C21.8345 30.5218 21.973 30.85 22.25 31.127C22.527 31.404 22.8617 31.5425 23.254 31.5425C23.6463 31.5425 23.9808 31.404 24.2575 31.127ZM22.423 25.5115H23.9615C24.0128 24.7808 24.193 24.134 24.502 23.571C24.811 23.0083 25.4155 22.277 26.3155 21.377C27.0102 20.682 27.5217 20.0172 27.85 19.3825C28.1783 18.7482 28.3425 18.036 28.3425 17.246C28.3425 15.9 27.8725 14.7822 26.9325 13.8925C25.9928 13.0025 24.7883 12.5575 23.319 12.5575C22.1243 12.5575 21.0732 12.8793 20.1655 13.523C19.2578 14.1667 18.5757 14.9808 18.119 15.9655L19.5345 16.531C19.9012 15.7923 20.3838 15.2147 20.9825 14.798C21.5815 14.3813 22.336 14.173 23.246 14.173C24.4513 14.173 25.3437 14.4788 25.923 15.0905C26.5027 15.7018 26.7925 16.4075 26.7925 17.2075C26.7925 17.9178 26.6155 18.5532 26.2615 19.1135C25.9078 19.6738 25.354 20.3347 24.6 21.096C23.7513 21.9013 23.1763 22.6385 22.875 23.3075C22.5737 23.9768 22.423 24.7115 22.423 25.5115Z" fill="#850000"/>
+          </svg>
+        </span>
+        <h2>General Questions Asked<br>by Our Customers</h2>
+      </div>
+
+      <div class="sfaq__bottom">
+        <p>Our team of advisors is always here to help you with quick, clear and reliable answers whenever needed.</p>
+        <a class="btn-solid btn-label" href="#">Talk to an Advisor</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sfaq__half">
+    <div class="faqs" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ================= 7 · CONCIERGE ================= -->
+<section class="scon">
+  <div class="scon__top">
+    <span class="scon__tag eyebrow">Looking for the right design?</span>
+    <h2>Lets start with a conversation</h2>
+    <p>Whether you&rsquo;re visiting us in Abu Dhabi or Dubai, or reaching out from anywhere in the world &mdash; our advisors are here to guide you.</p>
+  </div>
+
+  <div class="scon__row">
+    <div class="scon__cta">
+      <span class="scon__icon">
+        <!-- storefront, exported from the design file -->
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M41 21.781V38.231C41 39.0053 40.732 39.6603 40.196 40.196C39.6603 40.732 39.0053 41 38.231 41H9.71896C8.94463 41 8.28963 40.732 7.75396 40.196C7.21796 39.6603 6.94996 39.0053 6.94996 38.231V21.704C6.04229 21.032 5.42563 20.1768 5.09996 19.1385C4.77429 18.1002 4.78196 17.036 5.12296 15.946L7.08096 9.5425C7.34763 8.6935 7.77579 8.0575 8.36546 7.6345C8.95513 7.2115 9.67046 7 10.5115 7H37.277C38.1333 7 38.873 7.207 39.496 7.621C40.1193 8.03533 40.5515 8.65017 40.7925 9.4655L42.877 15.946C43.218 17.036 43.2173 18.113 42.875 19.177C42.5326 20.241 41.9076 21.109 41 21.781ZM28.423 21.231C29.7486 21.231 30.7705 20.863 31.4885 20.127C32.2065 19.391 32.5116 18.6115 32.404 17.7885L31 8.5385H24.769V17.327C24.769 18.373 25.123 19.2852 25.831 20.0635C26.5386 20.8418 27.4026 21.231 28.423 21.231ZM19.2655 21.231C20.4038 21.231 21.3493 20.8502 22.102 20.0885C22.8546 19.3268 23.231 18.4063 23.231 17.327V8.5385H16.9615L15.5575 17.9425C15.4755 18.6038 15.773 19.3172 16.45 20.0825C17.127 20.8482 18.0655 21.231 19.2655 21.231ZM10.281 21.231C11.2346 21.231 12.0608 20.9047 12.7595 20.252C13.4581 19.5993 13.8703 18.7962 13.996 17.8425L15.3345 8.5385H10.2575C9.82179 8.5385 9.46929 8.63467 9.19996 8.827C8.93063 9.01933 8.74479 9.30783 8.64246 9.6925L6.64996 16.3C6.26529 17.4873 6.41779 18.606 7.10746 19.656C7.79746 20.706 8.85529 21.231 10.281 21.231ZM37.669 21.231C38.9153 21.231 39.9365 20.7398 40.7325 19.7575C41.5288 18.7755 41.7218 17.623 41.3115 16.3L39.281 9.6155C39.1783 9.23083 38.9923 8.95517 38.723 8.7885C38.4536 8.62183 38.1011 8.5385 37.6655 8.5385H32.627L33.9655 17.8425C34.1168 18.7962 34.5353 19.5993 35.221 20.252C35.907 20.9047 36.723 21.231 37.669 21.231ZM9.71896 39.4615H38.231C38.5643 39.4615 38.8526 39.3462 39.096 39.1155C39.3396 38.8845 39.4615 38.5897 39.4615 38.231V22.527C39.2641 22.6117 39.002 22.6732 38.675 22.7115C38.348 22.7498 38.0126 22.769 37.669 22.769C36.8103 22.769 36.0251 22.5813 35.3135 22.206C34.6018 21.8303 33.9178 21.2373 33.2615 20.427C32.7538 21.1193 32.1128 21.6828 31.3385 22.1175C30.5641 22.5518 29.6038 22.769 28.4575 22.769C27.6115 22.769 26.843 22.589 26.152 22.229C25.461 21.8687 24.7436 21.3167 24 20.573C23.346 21.3013 22.6101 21.8495 21.7925 22.2175C20.9745 22.5852 20.1718 22.769 19.3845 22.769C18.5051 22.769 17.6655 22.605 16.8655 22.277C16.0655 21.9487 15.3821 21.332 14.8155 20.427C13.7845 21.409 12.8793 22.0448 12.1 22.3345C11.3206 22.6242 10.7143 22.769 10.281 22.769C9.94496 22.769 9.62379 22.7498 9.31746 22.7115C9.01079 22.6732 8.73446 22.6117 8.48846 22.527V38.231C8.48846 38.5897 8.61029 38.8845 8.85396 39.1155C9.09729 39.3462 9.38563 39.4615 9.71896 39.4615Z" fill="#B59E7D"/>
+        </svg>
+      </span>
+      <div class="scon__head">
+        <h3>Book a Store Visit</h3>
+        <p>Step into our boutique for an unhurried, private consultation.</p>
+      </div>
+      <a class="btn-line btn-label" href="#">Book an Appointment</a>
+    </div>
+
+    <div class="scon__div" aria-hidden="true">
+      <span class="cap"></span><span class="line"></span><span class="end"></span>
+    </div>
+
+    <div class="scon__cta">
+      <span class="scon__icon">
+        <!-- concierge, exported from the design file -->
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M21.9999 41.9998V40.4613H43.9999V41.9998H21.9999ZM23.9999 37.2308C23.9999 34.9151 24.7666 32.9093 26.2999 31.2133C27.8332 29.517 29.7332 28.552 31.9999 28.3183V27.4963C31.9999 27.2396 32.0954 27.0095 32.2864 26.8058C32.4774 26.6018 32.7152 26.4998 32.9999 26.4998C33.2589 26.4998 33.4902 26.6018 33.6939 26.8058C33.8979 27.0095 33.9999 27.2408 33.9999 27.4998V28.3193C36.2589 28.5523 38.1569 29.517 39.6939 31.2133C41.2312 32.9093 41.9999 34.9151 41.9999 37.2308H23.9999ZM25.6269 35.6923H40.3614C39.9664 33.969 39.0959 32.5445 37.7499 31.4188C36.4039 30.2935 34.8222 29.7308 33.0049 29.7308C31.1732 29.7308 29.5779 30.2935 28.2189 31.4188C26.8602 32.5445 25.9962 33.969 25.6269 35.6923ZM4.0769 23.7843V8.5458H11.5189V11.1268L27.4539 6.4458L41.3074 10.7073V11.7883C41.3074 12.75 40.8844 13.5801 40.0384 14.2788C39.1921 14.9775 38.2254 15.3268 37.1384 15.3268H31.2459V15.7498C31.2459 16.3318 30.9441 17.0286 30.3404 17.8403C29.7364 18.6516 29.1639 19.1611 28.6229 19.3688L16.6039 23.7843H4.0769ZM5.6154 22.2458H9.9309V10.0843H5.6154V22.2458ZM11.5189 22.2458H16.4114L28.6614 17.6728C28.9614 17.5728 29.1967 17.3536 29.3674 17.0153C29.5377 16.6766 29.6229 16.3573 29.6229 16.0573V15.3268H25.6189L19.8309 17.2653L19.2309 15.7883L25.5269 13.7883H37.1384C37.6564 13.7883 38.1884 13.6193 38.7344 13.2813C39.2807 12.9436 39.6051 12.4601 39.7074 11.8308L27.2924 8.0458L11.5189 12.7768V22.2458Z" fill="#B59E7D"/>
+        </svg>
+      </span>
+      <div class="scon__head">
+        <h3>Speak to an Advisor</h3>
+        <p>Connect with a Jaipur Gems advisor via WhatsApp &mdash; wherever you are.</p>
+      </div>
+      <a class="btn-line btn-label" href="#">Start a Conversation</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 8 · FOOTER ================= -->
+<footer class="foot">
+  <div class="foot__main">
+    <div class="foot__brand">
+      <img src="assets/logo-light.svg" alt="Jaipur Gems">
+      <p>Rooted in India&rsquo;s finest artisanal traditions, Jaipur Gems has been designing and crafting jewellery by hand since 1974 &mdash; pieces made not for a season, but for a lifetime.</p>
+    </div>
+
+    <nav class="foot__cols">
+      <div class="foot__col">
+        <h3>Shop</h3>
+        <a href="#">Gold</a><a href="#">Polki</a><a href="#">Diamond</a><a href="#">Gemstone</a><a href="#">Shop All</a>
+      </div>
+      <div class="foot__col">
+        <h3>About</h3>
+        <a href="#">Our Story</a><a href="#">Journal</a><a href="#">Contact Us</a>
+        <a href="jaipur-gems-store-listing-design.html">Stores</a>
+      </div>
+      <div class="foot__col">
+        <h3>Socials</h3>
+        <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">X</a><a href="#">Pinterest</a>
+      </div>
+      <div class="foot__col">
+        <h3>Legal</h3>
+        <a href="#">Privacy Policy</a><a href="#">Refund Policy</a><a href="#">Terms of Service</a>
+      </div>
+    </nav>
+
+    <div class="foot__news">
+      <h3>Subscribe to Our Newsletter</h3>
+      <form onsubmit="return false">
+        <input type="email" placeholder="Your Email" aria-label="Your Email">
+        <button class="btn-solid btn-label" type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="foot__bar">
+    <span class="foot__c">&copy; 2026 Jaipur Gems</span>
+    <span class="foot__pay">
+      <span>Visa</span><span>Mastercard</span><span>Amex</span><span>PayPal</span><span>Diners</span><span>Discover</span>
+    </span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   0 — helpers
+   ============================================================ */
+function stars(n, size){
+  var s = '';
+  for (var i = 1; i <= 5; i++) s += '<span' + (i > n ? ' class="off"' : '') + '>&#9733;</span>';
+  return '<span class="stars">' + s + '</span>';
+}
+
+/* a rail steps by one card + gap; arrows disable at the ends */
+function wireRail(rail, arrowBox){
+  function step(){
+    var first = rail.firstElementChild;
+    if (!first) return 0;
+    var cs = getComputedStyle(rail);
+    var gap = parseFloat(cs.columnGap || cs.gap) || 0;
+    return first.getBoundingClientRect().width + gap;
+  }
+  function sync(){
+    if (!arrowBox) return;
+    var b = arrowBox.querySelectorAll('button');
+    b[0].disabled = rail.scrollLeft <= 2;
+    b[1].disabled = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2;
+  }
+  if (arrowBox){
+    arrowBox.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        rail.scrollBy({ left: step() * parseInt(b.dataset.dir, 10), behavior:'smooth' });
+      });
+    });
+  }
+  rail.addEventListener('scroll', sync, { passive:true });
+  window.addEventListener('resize', sync);
+  sync();
+  return { sync:sync, step:step };
+}
+
+/* ============================================================
+   1 — services
+   ============================================================ */
+var SERVICES = ['Private Viewings','High Jewellery','Bespoke Commissions'];
+document.getElementById('svcList').innerHTML = SERVICES.map(function(t){
+  return '<span class="sdet__tag"><span class="nugget"></span>' + t + '</span>';
+}).join('');
+
+/* ============================================================
+   2 — gallery: arrows on desktop, swipe + dots on mobile
+   ============================================================ */
+var galRail = document.getElementById('galRail');
+var galDots = document.getElementById('galDots');
+var galApi  = wireRail(galRail, document.getElementById('galArrows'));
+
+galDots.innerHTML = Array.prototype.map.call(galRail.children, function(_, i){
+  return '<i' + (i === 0 ? ' class="on"' : '') + '></i>';
+}).join('');
+
+galRail.addEventListener('scroll', function(){
+  var s = galApi.step();
+  if (!s) return;
+  var i = Math.round(galRail.scrollLeft / s);
+  galDots.querySelectorAll('i').forEach(function(d, n){ d.classList.toggle('on', n === i); });
+}, { passive:true });
+
+/* ============================================================
+   3 — reviews (placeholder copy — not pulled from Google)
+   ============================================================ */
+var REVIEWS = [
+  { n:5, t:'Bought my wedding set here. They let us take our time over it and nothing felt rushed. The polki work is exactly what we had been looking for.', who:'Ananya R.', when:'2 weeks ago' },
+  { n:5, t:'The advisor explained the difference between polki and other settings properly, without pushing anything. Rare to find.', who:'Rohit M.', when:'a month ago' },
+  { n:4, t:'Beautiful pieces and a calm room to see them in. Took a while to get an appointment but it was worth the wait.', who:'Priya S.', when:'2 months ago' },
+  { n:5, t:'Third generation of my family buying from them. The craftsmanship has not changed in all that time.', who:'Vikram D.', when:'3 months ago' },
+  { n:5, t:'Had a necklace reset for my mother. They kept us updated the whole way through and the finish is immaculate.', who:'Sneha K.', when:'4 months ago' }
+];
+document.getElementById('revRail').innerHTML = REVIEWS.map(function(r){
+  return '<article class="rcard">'
+    + stars(r.n)
+    + '<p>' + r.t + '</p>'
+    + '<div class="rcard__meta"><b>' + r.who + '</b><span>' + r.when + '</span></div>'
+    + '</article>';
+}).join('');
+wireRail(document.getElementById('revRail'), document.getElementById('revArrows'));
+
+/* ============================================================
+   4 — products available in store
+   ============================================================ */
+var PRODUCTS = [
+  { name:'Aqua Dreams',          img:'assets/product-tile-1.webp' },
+  { name:'Floral Motif Bangle',  img:'assets/product-tile-2.webp' },
+  { name:'Surreal Vision Bangle',img:'assets/product-tile-3.webp' },
+  { name:'Serene Bliss',         img:'assets/product-tile-2.webp' },
+  { name:'Lotus Cuff',           img:'assets/product-tile-1.webp' }
+];
+document.getElementById('prodRail').innerHTML = PRODUCTS.map(function(p){
+  return '<a class="pcard" href="#">'
+    + '<span class="pcard__img" style="background-image:url(\'' + p.img + '\')"><i></i></span>'
+    + '<span class="pcard__info">'
+    +   '<span class="pcard__name">' + p.name + '</span>'
+    +   '<span class="pcard__price">Price On Request</span>'
+    + '</span></a>';
+}).join('');
+var prodRail = document.getElementById('prodRail');
+var prodApi  = wireRail(prodRail, null);
+
+/* ---- Madrid edge cursor over the product rail (desktop only) ----
+   The native pointer is hidden inside the zones and a trailing
+   "Previous" / "Next" label follows the cursor instead. */
+var galCursor = document.getElementById('galCursor');
+var galLabel  = galCursor.querySelector('.gcursor__label');
+
+function isMobile(){ return window.matchMedia('(max-width:767px)').matches; }
+
+function animateCursor(e){
+  var x = e.clientX - galCursor.offsetWidth / 2;
+  var y = e.clientY - galCursor.offsetHeight / 2;
+  galCursor.animate({ transform:'translate(' + x + 'px, ' + y + 'px)' },
+                    { duration:100, fill:'forwards' });
+}
+
+document.querySelectorAll('.sprod__zone').forEach(function(zone){
+  var type = zone.dataset.type;
+
+  zone.addEventListener('mouseenter', function(e){
+    if (isMobile()) return;
+    galLabel.textContent = type === 'prev' ? 'Previous' : 'Next';
+    galCursor.dataset.type = type;
+    animateCursor(e);
+  });
+  zone.addEventListener('mousemove', function(e){ if (!isMobile()) animateCursor(e); });
+  zone.addEventListener('mouseleave', function(){ galCursor.dataset.type = ''; });
+  zone.addEventListener('blur',      function(){ galCursor.dataset.type = ''; });
+
+  zone.addEventListener('click', function(){
+    prodRail.scrollBy({ left: prodApi.step() * (type === 'prev' ? -1 : 1), behavior:'smooth' });
+  });
+});
+
+/* ============================================================
+   5 — store FAQs
+   ============================================================ */
+var FAQS = [
+  { q:'Do I need an appointment?',
+    a:'Walk-ins are welcome through opening hours. Booking simply means an advisor is expecting you and the pieces you want to see are ready when you arrive.' },
+  { q:'What is kept at this store?',
+    a:'This room carries high jewellery, bridal Jadau and bespoke commissions. Anything held at another store or at our atelier can be brought in with a few days’ notice.' },
+  { q:'How long does a private viewing take?',
+    a:'An hour is typical. Bridal and high jewellery appointments often run longer, and we never rush a table. Tell us the occasion and we will plan the time accordingly.' },
+  { q:'Why do some pieces show price on request?',
+    a:'High jewellery and one-of-a-kind pieces are priced by their stones, so no two are alike. Your advisor will share the price in person or over WhatsApp.' },
+  { q:'Is there parking at the store?',
+    a:'[Placeholder — parking and access details to be confirmed with the store team.]' }
+];
+
+var faqList = document.getElementById('faqList');
+faqList.innerHTML = FAQS.map(function(f){
+  return '<div class="faq">'
+    + '<button class="faq__q" type="button">' + f.q + '<span class="faq__sign"></span></button>'
+    + '<div class="faq__a"><p>' + f.a + '</p></div>'
+    + '</div>';
+}).join('');
+
+faqList.querySelectorAll('.faq__q').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var item  = btn.parentNode;
+    var panel = item.querySelector('.faq__a');
+    var open  = item.classList.contains('open');
+
+    faqList.querySelectorAll('.faq').forEach(function(f){
+      f.classList.remove('open');
+      f.querySelector('.faq__a').style.maxHeight = '0px';
+    });
+    if (!open){
+      item.classList.add('open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    }
+  });
+});
+
+/* ============================================================
+   6 — header hairline
+   ============================================================ */
+var hdr = document.getElementById('hdr');
+function onScroll(){ hdr.classList.toggle('is-stuck', window.scrollY > 8); }
+window.addEventListener('scroll', onScroll, { passive:true });
+onScroll();
+</script>
+</body>
+</html>
