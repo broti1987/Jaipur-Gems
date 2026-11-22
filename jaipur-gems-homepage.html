@@ -120,10 +120,10 @@ input{font:inherit;color:inherit;}
 .motif img{-webkit-mask:radial-gradient(closest-side,#000 72%,transparent 100%);mask:radial-gradient(closest-side,#000 72%,transparent 100%)}  /* feather the image itself, so the blur on .motif spreads past its box with no edge */
 .motif img{width:100%;height:100%;object-fit:contain;display:block}
 .hero.is-motif .motif{opacity:1;transform:scale(1)}
-/* Final state: the motif recedes behind the columns — layer blur + a touch of scale,
-   eased in alongside the ring opening. Matches Brand Motif → Layer blur 32 in Figma. */
-.hero.is-deep .motif{filter:blur(32px);transform:scale(.96);opacity:0;
-  transition:transform 2.4s var(--ease-open), filter 2.4s var(--ease-open), opacity 1.4s ease 2.2s}   /* blur first, then fade away */
+/* Final state: the brand motif stays — it travels up and settles at 80% above the title (it replaces the
+   nugget; Figma Hero Text → Brand Motif). The flight is set in JS (settleMotif); once it lands, the copy
+   inside the hero text takes over so it drifts with the centre column. */
+.hero.is-settled .motif{opacity:0;transition:none}
 
 /* Columns sit above the motif; each is a full-stage layer that moves on Y.
    Layers ignore the pointer so only the tiles themselves are hit. */
@@ -168,14 +168,18 @@ input{font:inherit;color:inherit;}
 /* Hero Text (Figma 3948:18532) — sits in the centre column over the motif and drifts with it.
    Branding/Nugget over the H1, then the strapline in Type/Eyebrow/Large. Gaps are set so the
    space nugget→capitals and baseline→strapline look the same (see heroText()). */
-.htext{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;
-  pointer-events:none;opacity:0;transform:translateY(8px);transition:opacity 1s ease, transform 1.2s var(--ease-out)}
-.hero.is-open .htext{opacity:1;transform:none}
-.htext__top{display:flex;flex-direction:column;align-items:center;gap:12px}
-.htext__tile{width:24px;height:24px;flex:none;display:flex;align-items:center;justify-content:center}   /* Figma: plain Branding/Nugget, no tile */
-.htext__tile img{width:24px;height:24px;display:block}
+.htext{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;pointer-events:none}
+/* title + strapline fade up once the grid has opened; the motif is already there (it flew in) */
+.htext h1,.htext .h1,.htext__rule{opacity:0;transform:translateY(8px);transition:opacity 1s ease, transform 1.2s var(--ease-out)}
+.hero.is-open .htext h1,.hero.is-open .htext .h1,.hero.is-open .htext__rule{opacity:1;transform:none}
+.htext__motif{display:block;flex:none;opacity:0}
+.hero.is-settled .htext__motif{opacity:1}
+.htext__motif img{width:100%;height:100%;object-fit:contain;display:block;
+  -webkit-mask:radial-gradient(closest-side,#000 72%,transparent 100%);mask:radial-gradient(closest-side,#000 72%,transparent 100%)}
 .htext h1,.htext .h1{margin:0;font-family:var(--display);font-weight:400;line-height:1.1;letter-spacing:-.0025em;color:var(--black)}
-.htext__rule{display:inline-flex;align-items:center}
+.htext__rule{display:inline-flex;align-items:center;gap:10px}
+.htext--s .htext__rule span{font-size:10px}   /* Type/Eyebrow/Small on the 32px title layouts */
+.htext__rule i{width:8px;height:8px;flex:none;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%278%27%20height%3D%278%27%3E%3Cpath%20d%3D%27M4%201.17%206.83%204%204%206.83%201.17%204Z%27%20fill%3D%27%23B59E7D%27/%3E%3C/svg%3E") center/8px 8px no-repeat}   /* Branding/Small Nugget either side */
 .htext__rule span{font-family:var(--ui);font-weight:600;font-size:12px;line-height:1.3;letter-spacing:.10em;text-transform:uppercase;color:var(--sand-800);white-space:nowrap}
 /* hover: the photo and its border draw in to 90%, and the corner nuggets travel in with them,
    staying 10px off the new corners (each edge moves in 5% of the tile's width / height) */
@@ -709,6 +713,36 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
   .pcard__img{height:320px}
 }
 
+
+/* ============================================================
+   THE JAIPUR JOURNAL — Madrid "featured blog": title left, View Journal right, four square article cards.
+   Figma: Journal (Heading/H4 title · Button Link · Journal Card: H4·Mobile title, UI/Label tag, Body/Small author)
+   ============================================================ */
+.journal{background:var(--sand-100);padding:72px 24px;display:flex;flex-direction:column;gap:32px;position:relative;z-index:2}
+.journal__head{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.journal__head h2{margin:0;font-family:var(--display);font-weight:400;font-size:20px;line-height:1.6;color:var(--black)}
+.journal__all{font-family:var(--ui);font-weight:600;font-size:10px;line-height:1;letter-spacing:.08em;text-transform:uppercase;color:var(--black);
+  text-decoration:none;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;padding-bottom:3px;transition:background-size .4s var(--ease-out)}
+.journal__all:hover{background-size:100% 1px}
+.journal__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.jcard{display:flex;flex-direction:column;gap:16px;text-decoration:none;color:inherit}
+.jcard__img{display:block;aspect-ratio:1/1;overflow:hidden;background:var(--surface-placeholder)}
+.jcard__img img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.22,1,.36,1)}
+.jcard:hover .jcard__img img{transform:scale(1.04)}
+.jcard__info{display:flex;flex-direction:column;gap:8px}
+.jcard__title{font-family:var(--display);font-size:14px;line-height:1.6;color:var(--black)}                 /* Type/Heading/H5 */
+.jcard__meta{display:flex;align-items:center;gap:8px}
+.jcard__tag{font-family:var(--ui);font-weight:600;font-size:10px;line-height:1.2;letter-spacing:.06em;text-transform:uppercase;color:var(--black)}   /* Type/UI/Label */
+.jcard__author{font-family:var(--ui);font-size:12px;line-height:1.6;color:var(--sand-700)}                    /* Type/Body/Small */
+@media (max-width:1023px){ .journal__grid{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px} }
+@media (max-width:767px){
+  .journal{padding:48px 16px;gap:24px}
+  .journal__head h2{font-size:16px}
+  .journal__grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:16px;gap:16px;margin:0 -16px;padding:0 16px;scrollbar-width:none}
+  .journal__grid::-webkit-scrollbar{display:none}
+  .jcard{flex:0 0 78%;scroll-snap-align:start}
+}
+
 @media (prefers-reduced-motion:reduce){
   .curl{transition:none}
   .motif,.tile,.tile.ring,.hcta,.harrow,.tile::before,.tile::after,.lbird__a,.lnug,.lfade,.htext,.tile__name,.cat.rv,.store__img.rv-unravel,.store__img.rv-unravel img{transition:none}
@@ -790,6 +824,17 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
   <div class="store__img rv-unravel"><img data-src="assets/homepage/home-store" alt="Inside the Jaipur Gems boutique — arched display niches and a lit counter"></div>
 </section>
 
+<!-- ================= THE BEST OF JAIPUR GEMS (store page "Products Available in Store") ================= -->
+<section class="sprod" aria-labelledby="best-h" data-reveal>
+  <div class="sprod__head"><h2 id="best-h" class="lfade">The Best of Jaipur Gems</h2></div>
+  <div class="sprod__stage">
+    <div class="rail sprod__rail" id="prodRail"></div>
+    <button class="sprod__zone" data-type="prev" aria-label="Previous"></button>
+    <button class="sprod__zone" data-type="next" aria-label="Next"></button>
+  </div>
+</section>
+<div class="gcursor" id="galCursor" data-type="" aria-hidden="true"><span class="gcursor__label"></span></div>
+
 <!-- ================= CELEBRITIES ================= -->
 <section class="celebs" aria-labelledby="celebs-h" data-reveal>
   <h2 id="celebs-h" class="lfade">Celebrities in Jaipur Gems</h2>
@@ -845,16 +890,31 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
   </div>
 </section>
 
-<!-- ================= THE BEST OF JAIPUR GEMS (store page "Products Available in Store") ================= -->
-<section class="sprod" aria-labelledby="best-h" data-reveal>
-  <div class="sprod__head"><h2 id="best-h" class="lfade">The Best of Jaipur Gems</h2></div>
-  <div class="sprod__stage">
-    <div class="rail sprod__rail" id="prodRail"></div>
-    <button class="sprod__zone" data-type="prev" aria-label="Previous"></button>
-    <button class="sprod__zone" data-type="next" aria-label="Next"></button>
+<!-- ================= THE JAIPUR JOURNAL (Madrid featured-blog) ================= -->
+<section class="journal" aria-labelledby="journal-h" data-reveal>
+  <div class="journal__head">
+    <h2 id="journal-h" class="lfade">The Jaipur Journal</h2>
+    <a class="journal__all btn-label lfade" href="#">View Journal</a>
+  </div>
+  <div class="journal__grid">
+    <a class="jcard" href="#">
+      <span class="jcard__img"><img data-src="assets/homepage/home-journal-01" alt=""></span>
+      <span class="jcard__info"><span class="jcard__title">The Art of Jadau, Six Centuries in Gold</span><span class="jcard__meta"><span class="jcard__tag">Heritage</span><span class="jcard__author">Jaipur Gems</span></span></span>
+    </a>
+    <a class="jcard" href="#">
+      <span class="jcard__img"><img data-src="assets/homepage/home-journal-02" alt=""></span>
+      <span class="jcard__info"><span class="jcard__title">Choosing Your Polki Bridal Set</span><span class="jcard__meta"><span class="jcard__tag">Bridal</span><span class="jcard__author">Jaipur Gems</span></span></span>
+    </a>
+    <a class="jcard" href="#">
+      <span class="jcard__img"><img data-src="assets/homepage/home-journal-03" alt=""></span>
+      <span class="jcard__info"><span class="jcard__title">Inside the Jaipur Atelier</span><span class="jcard__meta"><span class="jcard__tag">Craft</span><span class="jcard__author">Jaipur Gems</span></span></span>
+    </a>
+    <a class="jcard" href="#">
+      <span class="jcard__img"><img data-src="assets/homepage/home-journal-04" alt=""></span>
+      <span class="jcard__info"><span class="jcard__title">Caring for Heirloom Jewellery</span><span class="jcard__meta"><span class="jcard__tag">Care</span><span class="jcard__author">Jaipur Gems</span></span></span>
+    </a>
   </div>
 </section>
-<div class="gcursor" id="galCursor" data-type="" aria-hidden="true"><span class="gcursor__label"></span></div>
 
 <!-- ================= GLOBAL CONCIERGE ================= -->
 <section class="conc" id="book">
@@ -934,7 +994,7 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
      Stage coords per layout; f = final rect, ring from `ring`.
      Tablet landscape uses Desktop, scaled to the viewport width.
      ========================================================== */
-  const LAYOUTS = {"desktop":{"w":1440,"h":900,"motif":{"x":595,"y":325,"s":250},"ring":{"cx":720,"cy":450,"r":205,"k":1},"cols":[{"id":"left","dir":-1,"period":2220,"split":491,"items":[{"n":9,"x":48,"y":-638,"w":376,"h":475},{"n":8,"x":48,"y":163,"w":365,"h":365},{"n":7,"x":48,"y":814,"w":350,"h":442}]},{"id":"centre","dir":1,"period":2277,"split":949.5,"items":[{"n":1,"x":546,"y":-280,"w":348,"h":476},{"n":"T","x":507,"y":239,"w":427,"h":360},{"n":6,"x":546,"y":642,"w":348,"h":348},{"n":5,"x":546,"y":1128,"w":348,"h":439}]},{"id":"right","dir":-1,"period":2207,"split":99999,"items":[{"n":2,"x":1024,"y":-349,"w":368,"h":504},{"n":4,"x":1032,"y":481,"w":360,"h":360},{"n":3,"x":1125,"y":1167,"w":267,"h":365}]}],"cta":{"x":562,"y":500},"arrow":{"x":1400,"y":788},"text":{"h1":44,"body":16}},"kiosk":{"w":1080,"h":1920,"motif":{"x":427.5,"y":847.5,"s":225},"ring":{"cx":540.0,"cy":960,"r":185,"k":0.9},"cols":[{"id":"left","dir":-1,"period":1663.7,"split":368.0,"items":[{"n":9,"x":36.0,"y":144.6,"w":281.8,"h":356.0},{"n":8,"x":36.0,"y":744.9,"w":273.5,"h":273.5},{"n":7,"x":36.0,"y":1232.8,"w":262.3,"h":331.2}]},{"id":"centre","dir":1,"period":1706.4,"split":712.0,"items":[{"n":1,"x":409.6,"y":412.9,"w":260.8,"h":356.7},{"n":"T","x":380.0,"y":801.9,"w":320.0,"h":269.8},{"n":6,"x":409.6,"y":1103.9,"w":260.8,"h":260.8},{"n":5,"x":409.6,"y":1468.1,"w":260.8,"h":329.0}]},{"id":"right","dir":-1,"period":1654.0,"split":99999,"items":[{"n":2,"x":768.2,"y":361.2,"w":275.8,"h":377.7},{"n":4,"x":774.2,"y":983.2,"w":269.8,"h":269.8},{"n":3,"x":843.9,"y":1497.3,"w":200.1,"h":273.5}]}],"text":{"h1":44,"body":16},"cta":{"x":382,"y":1020},"arrow":{"x":1040,"y":1790}},"tabletPortrait":{"w":834,"h":1194,"motif":{"x":311.0,"y":491.0,"s":212},"ring":{"cx":417.0,"cy":597,"r":174,"k":0.85},"cols":[{"id":"left","dir":-1,"period":1265.1,"split":285.3,"items":[{"n":9,"x":32.0,"y":-23.0,"w":214.3,"h":270.7},{"n":8,"x":32.0,"y":433.4,"w":208.0,"h":208.0},{"n":7,"x":32.0,"y":804.4,"w":199.5,"h":251.9}]},{"id":"centre","dir":1,"period":1297.6,"split":548.7,"items":[{"n":1,"x":317.8,"y":181.0,"w":198.3,"h":271.3},{"n":"T","x":295.3,"y":476.8,"w":243.3,"h":205.2},{"n":6,"x":317.8,"y":706.4,"w":198.3,"h":198.3},{"n":5,"x":317.8,"y":983.4,"w":198.3,"h":250.2}]},{"id":"right","dir":-1,"period":1257.7,"split":99999,"items":[{"n":2,"x":592.3,"y":141.7,"w":209.7,"h":287.2},{"n":4,"x":596.8,"y":614.7,"w":205.2,"h":205.2},{"n":3,"x":649.8,"y":1005.6,"w":152.2,"h":208.0}]}],"text":{"h1":32,"body":16},"cta":{"x":259,"y":650},"arrow":{"x":794,"y":1074}},"mobile":{"w":390,"h":844,"motif":{"x":120,"y":347,"s":150},"ring":{"cx":195,"cy":422,"r":127,"k":0.62},"cols":[{"id":"single","dir":-1,"period":5530.3,"split":99999,"items":[{"n":1,"x":20,"w":240,"h":328.3,"y":-1239.5},{"n":2,"x":150,"w":220,"h":301.3,"y":-891.2},{"n":3,"x":20,"w":250,"h":341.8,"y":-569.9},{"n":4,"x":170,"w":200,"h":200,"y":-208.1},{"n":5,"x":20,"w":230,"h":290.1,"y":11.9},{"n":"T","x":20,"w":350,"h":200,"y":322.0},{"n":6,"x":160,"w":210,"h":210,"y":542.0},{"n":7,"x":20,"w":240,"h":303.1,"y":772.0},{"n":8,"x":160,"w":210,"h":210,"y":1095.1},{"n":9,"x":20,"w":230,"h":290.6,"y":1325.1},{"n":1,"x":130,"w":240,"h":328.3,"y":1635.6},{"n":2,"x":20,"w":220,"h":301.3,"y":1983.9},{"n":3,"x":120,"w":250,"h":341.8,"y":2305.2},{"n":4,"x":20,"w":200,"h":200,"y":2667.0},{"n":5,"x":140,"w":230,"h":290.1,"y":2887.0},{"n":6,"x":20,"w":210,"h":210,"y":3197.1},{"n":7,"x":130,"w":240,"h":303.1,"y":3427.1},{"n":8,"x":20,"w":210,"h":210,"y":3750.2},{"n":9,"x":140,"w":230,"h":290.6,"y":3980.2}]}],"cta":{"x":37,"y":495},"arrow":{"x":366,"y":734},"text":{"h1":32,"body":16}}};
+  const LAYOUTS = {"desktop":{"w":1440,"h":900,"motif":{"x":595,"y":325,"s":250,"f":200,"g":-20},"ring":{"cx":720,"cy":450,"r":205,"k":1},"cols":[{"id":"left","dir":-1,"period":2276.0,"split":491,"items":[{"n":9,"x":48.0,"y":-680.0,"w":376.0,"h":475.0},{"n":8,"x":48.0,"y":149.0,"w":365.0,"h":365.0},{"n":7,"x":48.0,"y":828.0,"w":350.0,"h":442.0}]},{"id":"centre","dir":1,"period":2273.0,"split":949.5,"items":[{"n":1,"x":546.0,"y":-292.0,"w":348.0,"h":476.0},{"n":"T","x":507,"y":201.0,"w":427,"h":360},{"n":6,"x":546.0,"y":598.0,"w":348.0,"h":348.0},{"n":5,"x":546.0,"y":1112.0,"w":348.0,"h":439.0}]},{"id":"right","dir":-1,"period":2263.0,"split":99999,"items":[{"n":2,"x":1024.0,"y":-391.0,"w":368.0,"h":504.0},{"n":4,"x":1032.0,"y":467.0,"w":360.0,"h":360.0},{"n":3,"x":1125.0,"y":1181.0,"w":267.0,"h":365.0}]}],"cta":{"x":562,"y":500},"arrow":{"x":1400,"y":788},"text":{"h1":44,"body":16}},"kiosk":{"w":1080,"h":1920,"motif":{"x":427.5,"y":847.5,"s":225,"f":200,"g":-20},"ring":{"cx":540.0,"cy":960,"r":185,"k":0.9},"cols":[{"id":"left","dir":-1,"period":1662.3,"split":368.0,"items":[{"n":9,"x":36.0,"y":145.0,"w":282.0,"h":356.0},{"n":8,"x":36.0,"y":745.0,"w":274.0,"h":274.0},{"n":7,"x":36.0,"y":1232.0,"w":262.0,"h":331.0}]},{"id":"centre","dir":1,"period":1745.2,"split":712.0,"items":[{"n":1,"x":410.0,"y":413.0,"w":261.0,"h":357.0},{"n":"T","x":380.0,"y":813.1,"w":320.0,"h":269.8},{"n":6,"x":410.0,"y":1144.0,"w":261.0,"h":261.0},{"n":5,"x":410.0,"y":1507.0,"w":261.0,"h":329.0}]},{"id":"right","dir":-1,"period":1654.4,"split":99999,"items":[{"n":2,"x":768.0,"y":361.0,"w":276.0,"h":378.0},{"n":4,"x":774.0,"y":983.0,"w":270.0,"h":270.0},{"n":3,"x":844.0,"y":1497.0,"w":200.0,"h":274.0}]}],"text":{"h1":44,"body":16},"cta":{"x":382,"y":1020},"arrow":{"x":1040,"y":1790}},"tabletPortrait":{"w":834,"h":1194,"motif":{"x":311.0,"y":491.0,"s":212,"f":170,"g":-8},"ring":{"cx":417.0,"cy":597,"r":174,"k":0.85},"cols":[{"id":"left","dir":-1,"period":1265.8,"split":285.3,"items":[{"n":9,"x":32.0,"y":-23.0,"w":214.0,"h":271.0},{"n":8,"x":32.0,"y":434.0,"w":208.0,"h":208.0},{"n":7,"x":32.0,"y":805.0,"w":200.0,"h":252.0}]},{"id":"centre","dir":1,"period":1448.0,"split":548.7,"items":[{"n":1,"x":318.0,"y":181.0,"w":198.0,"h":271.0},{"n":"T","x":295.3,"y":518.4,"w":243.3,"h":205.2},{"n":6,"x":318.0,"y":792.0,"w":198.0,"h":198.0},{"n":5,"x":318.0,"y":1134.0,"w":198.0,"h":250.0}]},{"id":"right","dir":-1,"period":1257.8,"split":99999,"items":[{"n":2,"x":592.0,"y":142.0,"w":210.0,"h":287.0},{"n":4,"x":597.0,"y":615.0,"w":205.0,"h":205.0},{"n":3,"x":650.0,"y":1006.0,"w":152.0,"h":208.0}]}],"text":{"h1":32,"body":16},"cta":{"x":259,"y":650},"arrow":{"x":794,"y":1074}},"mobile":{"w":390,"h":844,"motif":{"x":120,"y":347,"s":150,"f":120,"g":6},"ring":{"cx":195,"cy":422,"r":127,"k":0.62},"cols":[{"id":"single","dir":-1,"period":5566.3,"split":99999,"items":[{"n":1,"x":20,"w":240,"h":328.3,"y":-1239.5},{"n":2,"x":150,"w":220,"h":301.3,"y":-891.2},{"n":3,"x":20,"w":250,"h":341.8,"y":-569.9},{"n":4,"x":170,"w":200,"h":200,"y":-208.1},{"n":5,"x":20,"w":230,"h":290.1,"y":11.9},{"n":"T","x":20,"w":350,"h":200,"y":340.0},{"n":6,"x":160,"w":210,"h":210,"y":578.0},{"n":7,"x":20,"w":240,"h":303.1,"y":808.0},{"n":8,"x":160,"w":210,"h":210,"y":1131.1},{"n":9,"x":20,"w":230,"h":290.6,"y":1361.1},{"n":1,"x":130,"w":240,"h":328.3,"y":1671.6},{"n":2,"x":20,"w":220,"h":301.3,"y":2019.9},{"n":3,"x":120,"w":250,"h":341.8,"y":2341.2},{"n":4,"x":20,"w":200,"h":200,"y":2703.0},{"n":5,"x":140,"w":230,"h":290.1,"y":2923.0},{"n":6,"x":20,"w":210,"h":210,"y":3233.1},{"n":7,"x":130,"w":240,"h":303.1,"y":3463.1},{"n":8,"x":20,"w":210,"h":210,"y":3786.2},{"n":9,"x":140,"w":230,"h":290.6,"y":4016.2}]}],"cta":{"x":37,"y":495},"arrow":{"x":366,"y":734},"text":{"h1":32,"body":16}}};
 
   // ring thumbnail sizes (desktop), scaled by ring.k per layout
   const INIT = {1:[76,104],2:[76,76],3:[76,104],4:[76,76],5:[76,96],6:[76,76],7:[76,96],8:[76,76],9:[76,96]};
@@ -1004,10 +1064,15 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
     const d = document.createElement('div'); d.className = 'htext';
     const size = (L.text && L.text.h1) || 44;
     const h1 = real ? `<h1 style="font-size:${size}px">Jaipur Gems</h1>` : `<div class="h1" style="font-size:${size}px">Jaipur Gems</div>`;
-    // Figma: tile → title 16, title → strapline 8 (12 / 5 at the 32px size)
-    d.style.gap = (size < 40 ? 5 : 8) + 'px';
-    d.innerHTML = `<div class="htext__top" style="gap:${size < 40 ? 12 : 16}px"><span class="htext__tile"><img src="assets/homepage/Red%20Nugget.png" alt=""></span>${h1}</div>` +
-                  `<div class="htext__rule"><span>Crafted by Hand since 1974</span></div>`;
+    // Figma Hero Text: Brand Motif (80% of its ring size) → title → strapline, 8px apart (6 on mobile)
+    const ms = L.motif.f || Math.round(L.motif.s * .8);          // Figma: 200 desktop & kiosk · 170 tablet portrait · 120 mobile
+    const mob = key === 'mobile';
+    d.style.gap = (mob ? 6 : 8) + 'px';
+    d.classList.toggle('htext--s', size < 40);                    // 32px title → strapline in Eyebrow/Small
+    // Figma tucks the title up into the motif's empty lower margin: motif → title is −20 (desktop, kiosk), −8 (tablet portrait), 6 (mobile)
+    const mg = (L.motif.g ?? (mob ? 6 : 8)) - (mob ? 6 : 8);
+    d.innerHTML = `<span class="htext__motif" style="width:${ms}px;height:${ms}px;margin-bottom:${mg}px"><img src="assets/homepage/home-hero-motif.webp" alt=""></span>${h1}` +
+                  `<div class="htext__rule">${mob ? '' : '<i></i>'}<span>Crafted by Hand since 1974</span>${mob ? '' : '<i></i>'}</div>`;   // mobile: no nuggets on the strapline
     if (!real) d.setAttribute('aria-hidden','true');
     place(d, rect); return d;
   }
@@ -1311,9 +1376,22 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
   /* ---------- Sequence ---------- */
   const wait = ms => new Promise(r => setTimeout(r, ms));
   function setOpen(){ open = true; hero.classList.add('is-open'); }
+  // The brand motif stays: it flies from the ring centre to its place above the title, shrinking to 80%.
+  // Measured in stage pixels from the real hero text (offsets ignore transforms) + the centre column's current Y.
+  function settleMotif(dur){
+    const span = stage.querySelector('.htext h1') && stage.querySelector('.htext h1').parentElement.querySelector('.htext__motif');
+    if (!span) return Promise.resolve();
+    const ht = span.parentElement, col = ht.parentElement;
+    const colY = new DOMMatrixReadOnly(getComputedStyle(col).transform).m42 || 0;
+    const tx = ht.offsetLeft + span.offsetLeft + span.offsetWidth / 2, ty = ht.offsetTop + span.offsetTop + span.offsetHeight / 2 + colY;
+    const mx = L.motif.x + L.motif.s / 2, my = L.motif.y + L.motif.s / 2, k = span.offsetWidth / L.motif.s;
+    const a = motif.animate([{ transform:'scale(1)' }, { transform:`translate(${tx - mx}px, ${ty - my}px) scale(${k})` }],
+                            { duration:dur, easing:'cubic-bezier(.76,0,.24,1)', fill:'forwards' });
+    return a.finished.then(() => hero.classList.add('is-settled'));
+  }
 
   async function play(){
-    if (reduce){ build(false); hero.classList.add('is-motif','is-deep'); setOpen(); return; }
+    if (reduce){ build(false); hero.classList.add('is-motif','is-deep','is-settled'); setOpen(); return; }
     build(true);
     await wait(T.motifIn);
     hero.classList.add('is-motif');
@@ -1333,8 +1411,9 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
       });
       return a.finished;
     });
-    setTimeout(() => { driftStart = performance.now(); }, T.open * .8);
-    await Promise.all(anims);
+    const settled = settleMotif(T.open);
+    await Promise.all([...anims, settled]);
+    driftStart = performance.now();               // columns start drifting once the motif has landed in the title block
     setOpen();
   }
 
@@ -1531,6 +1610,7 @@ img.is-missing::before{content:'';position:absolute;inset:0;background:var(--sur
 
   /* ---------- The Best of Jaipur Gems: product rail (as on the store page) ---------- */
   {
+    // same products and photos as the store detail page for now
     const PRODUCTS = [
       { name:'Aqua Dreams',           img:'assets/product-tile-1.webp' },
       { name:'Floral Motif Bangle',   img:'assets/product-tile-2.webp' },
